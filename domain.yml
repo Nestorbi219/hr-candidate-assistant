@@ -1,10 +1,21 @@
 version: "3.0"
 
 intents:
-  - provide_experience
-  - provide_skills
-  - provide_salary_expectation
-  - provide_desired_role
+  - greet  # Приветствие
+  - goodbye  # Прощание
+  - thank_you  # Благодарность
+  - provide_info  # Запуск формы для сбора данных
+  - provide_experience  # Пользователь сообщает об опыте работы
+  - provide_skills  # Пользователь сообщает о навыках
+  - provide_salary_expectation  # Пользователь сообщает о зарплатных ожиданиях
+  - provide_desired_role  # Пользователь сообщает о желаемой должности
+  - ask_about_roles  # Пользователь спрашивает о доступных вакансиях
+  - ask_about_process  # Пользователь спрашивает о процессе найма
+  - ask_about_company  # Пользователь спрашивает о компании
+  - request_human  # Запрос на общение с человеком
+  - not_sure  # Пользователь не уверен в ответе
+  - not_interested  # Пользователь не заинтересован в вакансии
+  - no_experience  # У пользователя нет опыта
 
 entities:
   - experience
@@ -19,18 +30,21 @@ slots:
     mappings:
       - type: from_entity
         entity: experience
+
   skills:
     type: list
     influence_conversation: true
     mappings:
       - type: from_entity
         entity: skills
+
   salary:
     type: text
     influence_conversation: true
     mappings:
       - type: from_entity
         entity: salary
+
   role:
     type: text
     influence_conversation: true
@@ -47,16 +61,42 @@ forms:
       - role
 
 responses:
+  utter_greet:
+    - text: "Здравствуйте! Я HR-бот. Давайте уточним информацию о вас."
+
   utter_ask_experience:
-    - text: "Расскажите, сколько у вас лет опыта работы?"
+    - text: "Сколько лет опыта у вас в сфере IT?"
+
   utter_ask_skills:
-    - text: "Какие основные навыки вы используете?"
+    - text: "Какие ключевые навыки у вас есть?"
+
   utter_ask_salary:
-    - text: "На какую зарплату вы рассчитываете?"
+    - text: "На какую зарплату рассчитываете?"
+
   utter_ask_role:
     - text: "На какую позицию вы хотите претендовать?"
+
   utter_thank_you:
     - text: "Спасибо за информацию! Мы свяжемся с вами позже."
+
+  utter_goodbye:
+    - text: "Всего доброго! Если будут вопросы, пишите."
+
+  utter_available_roles:
+    - text: "У нас есть открытые позиции: Data Scientist, Data Engineer, MLOps, Project Manager, Data Analyst."
+
+  utter_contact_hr:
+    - text: "Вы можете связаться с HR-менеджером по email: hr@company.com."
+
+  utter_not_sure:
+    - text: "Хорошо, если что-то неясно, дайте знать!"
+
+
+
+actions:
+  - action_check_candidate_fit  # Проверяет, подходит ли кандидат
+
+
 
 session_config:
   session_expiration_time: 60
