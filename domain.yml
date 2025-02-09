@@ -1,0 +1,63 @@
+version: "3.0"
+
+intents:
+  - provide_experience
+  - provide_skills
+  - provide_salary_expectation
+  - provide_desired_role
+
+entities:
+  - experience
+  - skills
+  - salary
+  - role
+
+slots:
+  experience:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: experience
+  skills:
+    type: list
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: skills
+  salary:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: salary
+  role:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: role
+
+forms:
+  hr_form:
+    required_slots:
+      - experience
+      - skills
+      - salary
+      - role
+
+responses:
+  utter_ask_experience:
+    - text: "Расскажите, сколько у вас лет опыта работы?"
+  utter_ask_skills:
+    - text: "Какие основные навыки вы используете?"
+  utter_ask_salary:
+    - text: "На какую зарплату вы рассчитываете?"
+  utter_ask_role:
+    - text: "На какую позицию вы хотите претендовать?"
+  utter_thank_you:
+    - text: "Спасибо за информацию! Мы свяжемся с вами позже."
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

@@ -1,0 +1,32 @@
+version: "3.1"
+
+nlu:
+  - intent: provide_experience
+    examples: |
+      - У меня [5 лет](experience) опыта работы
+      - Я работал [3 года](experience) в IT
+      - Опыт работы [10 лет](experience)
+  
+
+  - intent: provide_skills
+    examples: |
+      - Знаю [Python](skills) и [SQL](skills)
+      - У меня опыт в [Docker](skills) и [Kubernetes](skills)
+      - Мой основной навык — [машинное обучение](skills)
+      - Специализируюсь на [Data Science](skills)
+
+  - intent: provide_salary_expectation
+    examples: |
+      - Рассчитываю на [120 тысяч](salary)
+      - Моя зарплатная вилка — от [90 до 120 тысяч](salary)
+      - Ожидаю [100 тысяч рублей](salary)
+      - Хочу получать [150 тысяч в месяц](salary)
+
+  - intent: provide_desired_role
+    examples: |
+      - Хочу работать [Data Scientist](role)
+      - Интересует позиция [Project Manager](role)
+      - Хотел бы быть [MLOps Engineer](role)
+      - Интересует роль [Data Analyst](role)
+
+
