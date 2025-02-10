@@ -8,9 +8,9 @@ rules:
 
   - rule: Активировать форму для сбора данных
     steps:
-      - intent: provide_info  # Пользователь хочет предоставить информацию
-      - action: hr_form  # Активировать форму
-      - active_loop: hr_form  # Цикл продолжается, пока форма активна
+      - intent: provide_info
+      - action: hr_form 
+      - active_loop: hr_form 
 
   - rule: Завершить заполнение формы
     condition:
@@ -20,18 +20,4 @@ rules:
       - active_loop: null
       - slot_was_set:
           - requested_slot: null
-      - action: utter_thank_you  # Ответ после заполнения всех слотов
-
-  - rule: Активировать форму сбора данных
-    steps:
-      - intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
-
-  - rule: Завершить заполнение формы
-    condition:
-      - active_loop: hr_form
-    steps:
-      - action: hr_form
-      - active_loop: null
       - action: utter_thank_you

@@ -1,17 +1,19 @@
 version: "3.0"
 
 intents:
-  - greet  # Приветствие
-  - goodbye  # Прощание
-  - thank_you  # Благодарность
-  - provide_info  # Запуск формы для сбора данных
+  - greet
+  - goodbye
+  - thank_you
+  - provide_name
+  - provide_
+  - provide_info  # Формы для сбора данных
   - provide_experience  # Пользователь сообщает об опыте работы
   - provide_skills  # Пользователь сообщает о навыках
   - provide_salary_expectation  # Пользователь сообщает о зарплатных ожиданиях
   - provide_desired_role  # Пользователь сообщает о желаемой должности
-  - ask_about_roles  # Пользователь спрашивает о доступных вакансиях
-  - ask_about_process  # Пользователь спрашивает о процессе найма
-  - ask_about_company  # Пользователь спрашивает о компании
+  # - ask_about_roles  # Пользователь спрашивает о доступных вакансиях
+  # - ask_about_process  # Пользователь спрашивает о процессе найма
+  # - ask_about_company  # Пользователь спрашивает о компании
   - request_human  # Запрос на общение с человеком
   - not_sure  # Пользователь не уверен в ответе
   - not_interested  # Пользователь не заинтересован в вакансии
@@ -91,12 +93,8 @@ responses:
   utter_not_sure:
     - text: "Хорошо, если что-то неясно, дайте знать!"
 
-
-
 actions:
-  - action_check_candidate_fit  # Проверяет, подходит ли кандидат
-
-
+  - action_check_candidate_fit
 
 session_config:
   session_expiration_time: 60
