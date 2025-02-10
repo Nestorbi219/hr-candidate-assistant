@@ -6,18 +6,18 @@ intents:
   - thank_you
   - provide_name
   - provide_
-  - provide_info  # Формы для сбора данных
-  - provide_experience  # Пользователь сообщает об опыте работы
-  - provide_skills  # Пользователь сообщает о навыках
-  - provide_salary_expectation  # Пользователь сообщает о зарплатных ожиданиях
-  - provide_desired_role  # Пользователь сообщает о желаемой должности
-  # - ask_about_roles  # Пользователь спрашивает о доступных вакансиях
-  # - ask_about_process  # Пользователь спрашивает о процессе найма
-  # - ask_about_company  # Пользователь спрашивает о компании
-  - request_human  # Запрос на общение с человеком
-  - not_sure  # Пользователь не уверен в ответе
-  - not_interested  # Пользователь не заинтересован в вакансии
-  - no_experience  # У пользователя нет опыта
+  - provide_info
+  - provide_experience 
+  - provide_skills
+  - provide_salary_expectation 
+  - provide_desired_role
+  - ask_about_roles
+  - ask_about_process
+  - ask_about_company 
+  - request_human
+  - not_sure 
+  - not_interested
+  - no_experience 
 
 entities:
   - experience
