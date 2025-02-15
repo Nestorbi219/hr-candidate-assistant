@@ -22,6 +22,8 @@ pipeline:
 - name: DIETClassifier
   epochs: 100
 - name: EntitySynonymMapper
+- name: DucklingEntityExtractor
+  dimensions: ["number", "amount-of-money"]
 - name: ResponseSelector
   epochs: 100
 - name: FallbackClassifier

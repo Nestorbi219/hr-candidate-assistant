@@ -5,7 +5,6 @@ intents:
   - goodbye
   - thank_you
   - provide_name
-  - provide_
   - provide_info
   - provide_experience 
   - provide_skills
@@ -75,8 +74,20 @@ responses:
   utter_ask_salary:
     - text: "На какую зарплату рассчитываете?"
 
+#  utter_ask_role:
+#    - text: "На какую позицию вы хотите претендовать?"
+
   utter_ask_role:
-    - text: "На какую позицию вы хотите претендовать?"
+      - text: "Выберите желаемую позицию:"
+        buttons:
+          - title: "Data Scientist"
+            payload: "/provide_desired_role{\"role\":\"Data Scientist\"}"
+          - title: "Data Engineer"
+            payload: "/provide_desired_role{\"role\":\"Data Engineer\"}"
+          - title: "MLOps Engineer"
+            payload: "/provide_desired_role{\"role\":\"MLOps Engineer\"}"
+          - title: "Project Manager"
+            payload: "/provide_desired_role{\"role\":\"Project Manager\"}"
 
   utter_thank_you:
     - text: "Спасибо за информацию! Мы свяжемся с вами позже."
