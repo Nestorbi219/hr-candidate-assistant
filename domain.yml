@@ -107,10 +107,27 @@ responses:
     - text: "Всего доброго! Если будут вопросы, пишите."
 
   utter_available_roles:
-    - text: "У нас есть открытые позиции: Data Scientist, Data Engineer, MLOps, Project Manager, Data Analyst."
+    - text: "У нас есть открытые позиции: Data Scientist, Data Engineer, MLOps, Project Manager, Data Analyst. Что вы хотите сделать дальше?"
+      buttons:
+        - title: "Оставить информацию о себе"
+          payload: "/provide_info"
+        - title: "Узнать о компании"
+          payload: "/ask_about_company"
+        - title: "Поговорить с HR"
+          payload: "/request_human"
+        - title: "Ничего, спасибо"
+          payload: "/goodbye"
 
   utter_contact_hr:
-    - text: "Вы можете связаться с HR-менеджером по email: hr@company.com."
+    - text: "Вы можете связаться с HR-менеджером по email: hr@company.com. Что вы хотите сделать дальше?"
+      buttons:
+        - title: "Оставить информацию о себе"
+          payload: "/provide_info"
+        - title: "Узнать о вакансиях"
+          payload: "/ask_about_roles"
+        - title: "Ничего, спасибо"
+          payload: "/goodbye"
+
 
   utter_not_sure:
     - text: "Хорошо, если что-то неясно, дайте знать!"
