@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import gensim.downloader as api
 
 # Загружаем предобученные эмбеддинги
-word2vec_model = api.load("word2vec-ruscorpora-300")
+word2vec_model = api.load("word2vec-google-news-300")
 
 #print("sql" in word2vec_model)
 #print("python" in word2vec_model)
