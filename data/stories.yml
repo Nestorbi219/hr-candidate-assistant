@@ -1,29 +1,29 @@
-version: "3.0"
+version: "3.1"
 
 stories:
-  - story: Кандидат спрашивает о вакансиях
+  - story: Пользователь выбирает действие
+    steps:
+      - intent: choose_action
+      - action: utter_ask_action
+
+  - story: Пользователь хочет оставить информацию
+    steps:
+      - intent: provide_info
+      - action: hr_form
+      - active_loop: hr_form
+
+  - story: Пользователь хочет узнать про вакансии
     steps:
       - intent: ask_about_roles
       - action: utter_available_roles
 
-  - story: Кандидат хочет поговорить с человеком
+  - story: Пользователь хочет задать вопрос о компании
+    steps:
+      - intent: ask_about_company
+      - action: utter_contact_hr
+
+  - story: Пользователь хочет поговорить с HR
     steps:
       - intent: request_human
       - action: utter_contact_hr
-
-  - story: Завершение диалога (прощание)
-    steps:
-      - intent: goodbye
-      - action: utter_goodbye
-
-  - story: Благодарность пользователя
-    steps:
-      - intent: thank_you
-      - action: utter_thank_you
-
-  - story: Пользователь говорит "Спасибо, до свидания"
-    steps:
-      - intent: goodbye
-      - action: utter_thank_you
-      - action: utter_goodbye
 

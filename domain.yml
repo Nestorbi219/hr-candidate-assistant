@@ -1,9 +1,10 @@
-version: "3.0"
+version: "3.1"
 
 intents:
   - greet
   - goodbye
   - thank_you
+  - choose_action
   - provide_name
   - provide_info
   - provide_experience 
@@ -12,7 +13,7 @@ intents:
   - provide_desired_role
   - ask_about_roles
   - ask_about_process
-  - ask_about_company 
+  - ask_about_company
   - request_human
   - not_sure 
   - not_interested
@@ -56,12 +57,25 @@ slots:
 forms:
   hr_form:
     required_slots:
+      - role
       - experience
       - skills
       - salary
-      - role
 
 responses:
+
+  utter_ask_action:
+    - text: "Что вы хотите сделать?"
+      buttons:
+        - title: "Оставить информацию о себе"
+          payload: "/provide_info"
+        - title: "Узнать о вакансиях"
+          payload: "/ask_about_roles"
+        - title: "Задать вопрос про компанию"
+          payload: "/ask_about_company"
+        - title: "Поговорить с HR"
+          payload: "/request_human"
+
   utter_greet:
     - text: "Здравствуйте! Я HR-бот. Давайте уточним информацию о вас."
 
@@ -74,20 +88,17 @@ responses:
   utter_ask_salary:
     - text: "На какую зарплату рассчитываете?"
 
-#  utter_ask_role:
-#    - text: "На какую позицию вы хотите претендовать?"
-
   utter_ask_role:
-      - text: "Выберите желаемую позицию:"
-        buttons:
-          - title: "Data Scientist"
-            payload: "/provide_desired_role{\"role\":\"Data Scientist\"}"
-          - title: "Data Engineer"
-            payload: "/provide_desired_role{\"role\":\"Data Engineer\"}"
-          - title: "MLOps Engineer"
-            payload: "/provide_desired_role{\"role\":\"MLOps Engineer\"}"
-          - title: "Project Manager"
-            payload: "/provide_desired_role{\"role\":\"Project Manager\"}"
+    - text: "Выберите желаемую позицию:"
+      buttons:
+        - title: "Data Scientist"
+          payload: '/provide_desired_role{"role":"Data Scientist"}'
+        - title: "Data Engineer"
+          payload: '/provide_desired_role{"role":"Data Engineer"}'
+        - title: "MLOps Engineer"
+          payload: '/provide_desired_role{"role":"MLOps Engineer"}'
+        - title: "Project Manager"
+          payload: '/provide_desired_role{"role":"Project Manager"}'
 
   utter_thank_you:
     - text: "Спасибо за информацию! Мы свяжемся с вами позже."

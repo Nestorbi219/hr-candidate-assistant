@@ -1,10 +1,11 @@
-version: "3.0"
+version: "3.1"
 
 rules:
-  - rule: Приветствие
+  - rule: Приветствие и выбор действия
     steps:
       - intent: greet
       - action: utter_greet
+      - action: utter_ask_action  # Теперь бот сначала спрашивает, что делать
 
   - rule: Активировать форму для сбора данных
     steps:
@@ -25,4 +26,5 @@ rules:
       - action: hr_form
       - active_loop: null
       - action: utter_thank_you
+
 
