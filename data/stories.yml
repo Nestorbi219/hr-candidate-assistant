@@ -17,13 +17,7 @@ stories:
       - intent: ask_about_roles
       - action: utter_available_roles
 
-  - story: Пользователь хочет задать вопрос о компании
-    steps:
-      - intent: ask_about_company
-      - action: utter_contact_hr
-
   - story: Пользователь хочет поговорить с HR
     steps:
       - intent: request_human
       - action: utter_contact_hr
-

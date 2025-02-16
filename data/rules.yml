@@ -5,7 +5,7 @@ rules:
     steps:
       - intent: greet
       - action: utter_greet
-      - action: utter_ask_action  # Теперь бот сначала спрашивает, что делать
+      - action: utter_ask_action  # Бот сначала спрашивает, что делать
 
   - rule: Активировать форму для сбора данных
     steps:
@@ -13,11 +13,15 @@ rules:
       - action: hr_form
       - active_loop: hr_form
 
-  - rule: Заполнять слоты формы
-    condition:
-      - active_loop: hr_form
+  - rule: Ответить про вакансии
     steps:
-      - action: hr_form
+      - intent: ask_about_roles
+      - action: utter_available_roles  # Бот отвечает про вакансии и ЖДЕТ ответа пользователя
+
+  - rule: Ответить про компанию
+    steps:
+      - intent: ask_about_company
+      - action: utter_contact_hr  # Бот отвечает про компанию и ЖДЕТ ответа пользователя
 
 
   # - rule: Завершить заполнение формы
@@ -35,6 +39,7 @@ rules:
       - action: hr_form
       - active_loop: null
       - action: action_evaluate_candidate
+
 
 
 
