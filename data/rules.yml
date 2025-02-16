@@ -19,12 +19,22 @@ rules:
     steps:
       - action: hr_form
 
-  - rule: Завершить заполнение формы
+
+  # - rule: Завершить заполнение формы
+  # condition:
+  #   - active_loop: hr_form
+  # steps:
+  #   - action: hr_form
+  #   - active_loop: null
+  #   - action: utter_thank_you
+
+  - rule: Evaluate candidate after filling form
     condition:
       - active_loop: hr_form
     steps:
       - action: hr_form
       - active_loop: null
-      - action: utter_thank_you
+      - action: action_evaluate_candidate
+
 
 

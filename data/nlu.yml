@@ -1,5 +1,10 @@
 version: "3.1"
 
+regex_features:
+  - name: experience
+    pattern: "([0-9]+\\s?(год|лет|месяц|месяцев)?)"
+
+
 nlu:
   - intent: greet
     examples: |

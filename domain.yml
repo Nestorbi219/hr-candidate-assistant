@@ -117,6 +117,8 @@ responses:
 
 actions:
   - action_check_candidate_fit
+  - action_save_candidate_data
+  - action_evaluate_candidate
 
 session_config:
   session_expiration_time: 60
