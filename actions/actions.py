@@ -20,6 +20,13 @@ synonyms = {
     "tensorflow": "deep learning",
 }
 
+role_requirements = {
+            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"]},
+            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"]},
+            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"]},
+            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"]},
+            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
+}
 
 import re
 from rasa_sdk import Action
@@ -218,13 +225,6 @@ class ActionEvaluateCandidate(Action):
             dispatcher.utter_message(text="Ошибка: Некорректный формат опыта работы.")
             return []
 
-        role_requirements = {
-            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"]},
-            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"]},
-            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"]},
-            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"]},
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
-        }
 
         if role not in role_requirements:
             dispatcher.utter_message(text="Ошибка: указанной роли не существует.")
@@ -237,10 +237,7 @@ class ActionEvaluateCandidate(Action):
         skill_similarity = compute_similarity(skills, required["required_skills"])
 
         print("kkkk", exp_ok, skill_similarity)
-        if exp_ok and skill_similarity > 0.5:  # Порог 50% сходства
-            print("Сходство :", skill_similarity)
-            response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение."
-        elif exp_ok and skill_similarity > 0.4 and role == 'Data Scientist':
+        if exp_ok and skill_similarity > 0.6:  # Порог 60% сходства
             print("Сходство :", skill_similarity)
             response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение."
         else:
