@@ -135,6 +135,8 @@ responses:
 actions:
   - action_save_candidate_data
   - action_evaluate_candidate
+  - action_extract_salary
+  - action_extract_experience
 
 session_config:
   session_expiration_time: 60

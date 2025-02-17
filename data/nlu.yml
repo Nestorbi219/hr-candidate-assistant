@@ -120,6 +120,7 @@ nlu:
       - хотел бы получать [200 тыщ в месяц](salary)
       - [50000](salary)
       - [250000](salary)
+      - [150к](salary)
 
   - intent: provide_desired_role
     examples: |

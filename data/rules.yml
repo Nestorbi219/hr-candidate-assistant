@@ -23,16 +23,7 @@ rules:
       - intent: ask_about_company
       - action: utter_contact_hr  # Бот отвечает про компанию и ЖДЕТ ответа пользователя
 
-
-  # - rule: Завершить заполнение формы
-  # condition:
-  #   - active_loop: hr_form
-  # steps:
-  #   - action: hr_form
-  #   - active_loop: null
-  #   - action: utter_thank_you
-
-  - rule: Evaluate candidate after filling form
+  - rule: Оценка кандидата после заполнения формы
     condition:
       - active_loop: hr_form
     steps:
@@ -40,6 +31,15 @@ rules:
       - active_loop: null
       - action: action_evaluate_candidate
 
+  - rule: Обработать опыт работы пользователя
+    steps:
+      - intent: provide_experience
+      - action: action_extract_experience
+
+  - rule: Обработать зарплатные ожидания
+    steps:
+      - intent: provide_salary_expectation
+      - action: action_extract_salary
 
 
 

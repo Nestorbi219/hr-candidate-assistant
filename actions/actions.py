@@ -1,5 +1,6 @@
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
+from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
 import json
 import re
@@ -20,37 +21,57 @@ synonyms = {
 }
 
 
+import re
+from rasa_sdk import Action
+from rasa_sdk.events import SlotSet
+
 def parse_experience(experience_str):
     """
     Преобразует строку с опытом работы в число лет.
     """
     experience_str = experience_str.lower().strip()
 
-    # 🔹 Если указано "без опыта", возвращаем 0 лет
-    if re.search(r"без опыта|новичок|нет опыта", experience_str):
+    if re.search(r"без опыта|новичок|только закончил", experience_str):
         return 0.0
 
-    # 🔹 Обрабатываем "полтора года" как 1.5 года
     if re.search(r"полтора года", experience_str):
         return 1.5
 
-    # 🔹 Ищем число и единицу измерения
     match = re.search(r"(\d+(?:[.,]\d+)?)\s?(год|лет|месяц|месяцев)?", experience_str)
 
     if not match:
-        # Если числа нет, но сказано что "есть опыт" → по умолчанию 1 год
         if re.search(r"есть опыт|опыт работы", experience_str):
             return 1.0
-        return None  # Если ничего не нашли, возвращаем None
+        return None
 
-    value = float(match.group(1).replace(",", "."))  # Приводим к float (учитываем запятые)
-    unit = match.group(2)  # "год", "лет", "месяц", "месяцев"
+    value = float(match.group(1).replace(",", "."))
+    unit = match.group(2)
 
-    # 🔹 Если указаны месяцы, переводим в годы
     if unit in ["месяц", "месяцев"]:
         return round(value / 12, 2)
 
-    return value  # Если указан "год" или "лет", оставляем как есть
+    return value
+
+class ActionExtractExperience(Action):
+    def name(self):
+        return "action_extract_experience"
+
+    def run(self, dispatcher, tracker, domain):
+        experience_str = tracker.latest_message.get("text")
+        intent = tracker.latest_message.get("intent", {}).get("name")
+
+        if intent != "provide_experience":
+            return []
+
+        experience_years = parse_experience(experience_str)
+
+        if experience_years is None:
+            dispatcher.utter_message("Не смог определить ваш опыт. Попробуйте сказать, например: '5 лет', '7 месяцев' или 'без опыта'.")
+            return []
+
+        dispatcher.utter_message(f"Я понял, что у вас {experience_years} лет опыта.")
+        return [SlotSet("experience", experience_years)]
+
 
 
 
@@ -105,6 +126,48 @@ def compute_similarity(candidate_skills, required_skills):
     return np.mean(similarities) if similarities else 0
 
 
+def parse_salary(salary_str):
+    """
+    Преобразует строку с зарплатой в число рублей.
+    """
+    salary_str = salary_str.lower().strip()
+
+    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
+
+    if not match:
+        return None
+
+    value = float(match.group(1).replace(",", "."))
+    unit = match.group(2)
+
+    if unit in ["к", "тыс", "тысяч"]:
+        return int(value * 1000)
+    elif unit in ["млн", "миллион"]:
+        return int(value * 1000000)
+
+    return int(value)
+
+
+class ActionExtractSalary(Action):
+    def name(self):
+        return "action_extract_salary"
+
+    def run(self, dispatcher, tracker, domain):
+        salary_str = tracker.latest_message.get("text")
+        intent = tracker.latest_message.get("intent", {}).get("name")
+
+        if intent != "provide_salary_expectation":
+            return []
+
+        salary_amount = parse_salary(salary_str)
+
+        if salary_amount is None:
+            dispatcher.utter_message(
+                "Не смог определить зарплату. Попробуйте сказать, например: '150к', '90 тысяч', '1.2 млн'.")
+            return []
+
+        dispatcher.utter_message(f"Я понял, что вы ожидаете зарплату {salary_amount} рублей.")
+        return [SlotSet("salary", salary_amount)]
 
 
 class ActionSaveCandidateData(Action):
