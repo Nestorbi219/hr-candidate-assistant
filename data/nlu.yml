@@ -72,17 +72,42 @@ nlu:
       - Работал [6 лет](experience) аналитиком
       - Без опыта, только закончил обучение
       - Опыт [2.5 года](experience) в машинном обучении
-      - Год назад начал карьеру
+      - [Год](experience) назад начал карьеру
 
   - intent: provide_skills
     examples: |
+      # Data Scientist
       - Знаю [Python](skills) и [SQL](skills)
-      - У меня опыт в [Docker](skills) и [Kubernetes](skills)
-      - Мои основные навыки — [машинное обучение](skills), [NLP](skills)
-      - Специализируюсь на [Data Science](skills)
-      - Умею программировать на [C++](skills)
-      - я [шарю за плюсы](skills)
-      - Знаю [питон](skills) и [сиквел](skills)
+      - Опыт работы с [TensorFlow](skills) и [PyTorch](skills)
+      - Специализируюсь на [машинном обучении](skills) и [глубоком обучении](skills)
+      - Хорошо разбираюсь в [NLP](skills) и [компьютерном зрении](skills)
+      - Работаю с [pandas](skills), [NumPy](skills), [scikit-learn](skills)
+      - Знаком с [A/B тестированием](skills) и [статистикой](skills)
+      - Анализ данных с помощью [Jupyter Notebook](skills)
+
+      # Data Engineer
+      - Опыт работы с [Spark](skills) и [Hadoop](skills)
+      - Использую [Python](skills) и [SQL](skills) для ETL-процессов
+      - Разбираюсь в [Kafka](skills) и [Airflow](skills)
+      - Опыт работы с базами данных: [PostgreSQL](skills), [MongoDB](skills)
+      - Настраивал пайплайны данных с помощью [AWS Glue](skills)
+      - Автоматизировал обработку данных в [Apache Beam](skills)
+
+      # MLOps Engineer
+      - Разбираюсь в [Docker](skills) и [Kubernetes](skills)
+      - Опыт настройки CI/CD пайплайнов для ML-моделей
+      - Использую [MLflow](skills) для управления экспериментами
+      - Опыт работы с [TensorFlow Serving](skills) и [TorchServe](skills)
+      - Разворачиваю модели в облаке ([AWS SageMaker](skills), [GCP AI Platform](skills))
+      - Работаю с инструментами мониторинга ([Prometheus](skills), [Grafana](skills))
+
+      # Project Manager
+      - Владею методологиями [Agile](skills) и [Scrum](skills)
+      - Работаю с [JIRA](skills) и [Confluence](skills)
+      - Опыт управления командой разработчиков
+      - Знаю, как вести [roadmap](skills) и [backlog](skills)
+      - Умею организовывать [спринты](skills) и ретроспективы
+
 
   - intent: provide_salary_expectation
     examples: |

@@ -3,7 +3,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 import json
 import re
-from deeppavlov.models.embedders.fasttext_embedder import FasttextEmbedder
+# from deeppavlov.models.embedders.fasttext_embedder import FasttextEmbedder
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import gensim.downloader as api
@@ -11,8 +11,6 @@ import gensim.downloader as api
 # Загружаем предобученные эмбеддинги
 word2vec_model = api.load("word2vec-google-news-300")
 
-#print("sql" in word2vec_model)
-#print("python" in word2vec_model)
 
 synonyms = {
     "ml": "machine learning",
@@ -22,22 +20,38 @@ synonyms = {
 }
 
 
-
 def parse_experience(experience_str):
     """
-    Преобразует строковый опыт в число лет.
+    Преобразует строку с опытом работы в число лет.
     """
-    match = re.search(r"(\d+)\s?(год|лет|месяц|месяцев)?", experience_str.lower())
+    experience_str = experience_str.lower().strip()
+
+    # 🔹 Если указано "без опыта", возвращаем 0 лет
+    if re.search(r"без опыта|новичок|нет опыта", experience_str):
+        return 0.0
+
+    # 🔹 Обрабатываем "полтора года" как 1.5 года
+    if re.search(r"полтора года", experience_str):
+        return 1.5
+
+    # 🔹 Ищем число и единицу измерения
+    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(год|лет|месяц|месяцев)?", experience_str)
 
     if not match:
-        return None  # Если не удалось распознать, вернуть None
+        # Если числа нет, но сказано что "есть опыт" → по умолчанию 1 год
+        if re.search(r"есть опыт|опыт работы", experience_str):
+            return 1.0
+        return None  # Если ничего не нашли, возвращаем None
 
-    value = int(match.group(1))
-    unit = match.group(2)  # Год / месяц
+    value = float(match.group(1).replace(",", "."))  # Приводим к float (учитываем запятые)
+    unit = match.group(2)  # "год", "лет", "месяц", "месяцев"
 
-    if unit in ["месяц", "месяцев"]:  
-        return round(value / 12, 2)  # Преобразуем месяцы в годы
+    # 🔹 Если указаны месяцы, переводим в годы
+    if unit in ["месяц", "месяцев"]:
+        return round(value / 12, 2)
+
     return value  # Если указан "год" или "лет", оставляем как есть
+
 
 
 def normalize_skill(skill):
@@ -58,8 +72,6 @@ def get_word_embedding(word):
     except KeyError:
         print(f"[WARNING] Слово '{word}' отсутствует в модели Word2Vec!")
         return np.zeros(300)  # Размер вектора 300
-
-
 
 
 def compute_similarity(candidate_skills, required_skills):
@@ -144,11 +156,11 @@ class ActionEvaluateCandidate(Action):
             return []
 
         role_requirements = {
-            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL"]},
-            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark"]},
-            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD"]},
-            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "JIRA"]},
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "Power BI", "Python"]},
+            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"]},
+            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"]},
+            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"]},
+            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"]},
+            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
         }
 
         if role not in role_requirements:
@@ -162,10 +174,15 @@ class ActionEvaluateCandidate(Action):
         skill_similarity = compute_similarity(skills, required["required_skills"])
 
         print("kkkk", exp_ok, skill_similarity)
-        if exp_ok and skill_similarity > 0.75:  # Порог 75% сходства
-            response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение. (Сходство навыков: {round(skill_similarity * 100, 2)}%)"
+        if exp_ok and skill_similarity > 0.5:  # Порог 50% сходства
+            print("Сходство :", skill_similarity)
+            response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение."
+        elif exp_ok and skill_similarity > 0.4 and role == 'Data Scientist':
+            print("Сходство :", skill_similarity)
+            response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение."
         else:
-            response = f"К сожалению, вам пока не хватает опыта или навыков. (Сходство навыков: {round(skill_similarity * 100, 2)}%)"
+            print("Сходство :", skill_similarity)
+            response = f"К сожалению, вам пока не хватает опыта или навыков."
 
         dispatcher.utter_message(text=response)
         return []

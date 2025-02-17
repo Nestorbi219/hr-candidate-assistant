@@ -133,7 +133,6 @@ responses:
     - text: "Хорошо, если что-то неясно, дайте знать!"
 
 actions:
-  - action_check_candidate_fit
   - action_save_candidate_data
   - action_evaluate_candidate
 
