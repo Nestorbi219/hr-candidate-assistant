@@ -17,7 +17,36 @@ stories:
       - intent: ask_about_roles
       - action: utter_available_roles
 
-  - story: Пользователь хочет поговорить с HR
+  - story: Пользователь хочет подать заявку заново
+    steps:
+      - intent: provide_info_again
+      - action: action_reset_slots  # reset слотов
+      - action: hr_form
+      - active_loop: hr_form
+
+
+  - story: Пользователь спрашивает про процесс найма, потом подает заявку
+    steps:
+      - intent: ask_about_process
+      - action: utter_process_details
+      - action: utter_ask_action
+
+      - user: "/provide_info"
+        intent: provide_info
+      - action: hr_form
+      - active_loop: hr_form
+
+  - story: Пользователь разговаривает с HR и уходит
     steps:
       - intent: request_human
       - action: utter_contact_hr
+      - action: utter_ask_action
+
+      - user: "/goodbye"
+        intent: goodbye
+      - action: utter_goodbye
+
+  - story: Пользователь прощается
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye

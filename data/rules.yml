@@ -1,3 +1,4 @@
+#file: noinspection YAMLSchemaValidation
 version: "3.1"
 
 rules:
@@ -31,15 +32,15 @@ rules:
       - active_loop: null
       - action: action_evaluate_candidate
 
-  - rule: Обработать опыт работы пользователя
-    steps:
-      - intent: provide_experience
-      - action: action_extract_experience
-
-  - rule: Обработать зарплатные ожидания
-    steps:
-      - intent: provide_salary_expectation
-      - action: action_extract_salary
+#  - rule: Обработать опыт работы пользователя
+#    steps:
+#      - intent: provide_experience
+#      - action: action_extract_experience
+#
+#  - rule: Обработать зарплатные ожидания
+#    steps:
+#      - intent: provide_salary_expectation
+#      - action: action_extract_salary
 
 
 

@@ -1,91 +1,49 @@
-#### This file contains tests to evaluate that your bot behaves as expected.
-#### If you want to learn more, please see the docs: https://rasa.com/docs/rasa/testing-your-assistant
+version: "3.1"
 
-#stories:
-#- story: happy path 1
-#  steps:
-#  - user: |
-#      hello there!
-#    intent: greet
-#  - action: utter_greet
-#  - user: |
-#      amazing
-#    intent: mood_great
-#  - action: utter_happy
-#
-#- story: happy path 2
-#  steps:
-#  - user: |
-#      hello there!
-#    intent: greet
-#  - action: utter_greet
-#  - user: |
-#      amazing
-#    intent: mood_great
-#  - action: utter_happy
-#  - user: |
-#      bye-bye!
-#    intent: goodbye
-#  - action: utter_goodbye
-#
-#- story: sad path 1
-#  steps:
-#  - user: |
-#      hello
-#    intent: greet
-#  - action: utter_greet
-#  - user: |
-#      not good
-#    intent: mood_unhappy
-#  - action: utter_cheer_up
-#  - action: utter_did_that_help
-#  - user: |
-#      yes
-#    intent: affirm
-#  - action: utter_happy
-#
-#- story: sad path 2
-#  steps:
-#  - user: |
-#      hello
-#    intent: greet
-#  - action: utter_greet
-#  - user: |
-#      not good
-#    intent: mood_unhappy
-#  - action: utter_cheer_up
-#  - action: utter_did_that_help
-#  - user: |
-#      not really
-#    intent: deny
-#  - action: utter_goodbye
-#
-#- story: sad path 3
-#  steps:
-#  - user: |
-#      hi
-#    intent: greet
-#  - action: utter_greet
-#  - user: |
-#      very terrible
-#    intent: mood_unhappy
-#  - action: utter_cheer_up
-#  - action: utter_did_that_help
-#  - user: |
-#      no
-#    intent: deny
-#  - action: utter_goodbye
-#
-#- story: say goodbye
-#  steps:
-#  - user: |
-#      bye-bye!
-#    intent: goodbye
-#  - action: utter_goodbye
-#
-#- story: bot challenge
-#  steps:
-#  - user: |
-#      are you a bot?
-#    intent: bot_challenge
-#  - action: utter_iamabot
+stories:
+
+  - story: Тест — кандидат выбирает роль Data Scientist
+    steps:
+      - user: |
+          Привет
+        intent: greet
+      - action: utter_greet
+
+      - user: "/provide_info"
+        intent: provide_info
+      - action: hr_form
+      - active_loop: hr_form
+
+      - action: utter_ask_role
+
+      - user: |
+          Я хочу работать Data Scientist
+        intent: provide_desired_role
+        entities:
+          - role: "Data Scientist"
+      - action: action_extract_role
+
+      - user: |
+          У меня 3 года опыта
+        intent: provide_experience
+        entities:
+          - experience: "3 года"
+      - action: action_extract_experience
+
+      - user: |
+          Я знаю Python и SQL
+        intent: provide_skills
+        entities:
+          - skills: ["Python", "SQL"]
+      - action: action_extract_skills
+
+      - user: |
+          Ожидаю зарплату 150к рублей
+        intent: provide_salary_expectation
+        entities:
+          - salary: "150000"
+      - action: action_extract_salary
+
+      - action: hr_form
+      - active_loop: null
+      - action: action_evaluate_candidate

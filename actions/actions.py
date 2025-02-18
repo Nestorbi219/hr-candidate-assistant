@@ -8,6 +8,9 @@ import re
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import gensim.downloader as api
+import re
+from rasa_sdk import Action
+from rasa_sdk.events import SlotSet
 
 # Загружаем предобученные эмбеддинги
 word2vec_model = api.load("word2vec-google-news-300")
@@ -28,9 +31,6 @@ role_requirements = {
             "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
 }
 
-import re
-from rasa_sdk import Action
-from rasa_sdk.events import SlotSet
 
 def parse_experience(experience_str):
     """
