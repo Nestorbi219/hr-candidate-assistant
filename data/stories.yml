@@ -24,18 +24,6 @@ stories:
       - action: hr_form
       - active_loop: hr_form
 
-
-  - story: Пользователь спрашивает про процесс найма, потом подает заявку
-    steps:
-      - intent: ask_about_process
-      - action: utter_process_details
-      - action: utter_ask_action
-
-      - user: "/provide_info"
-        intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
-
   - story: Пользователь разговаривает с HR и уходит
     steps:
       - intent: request_human
