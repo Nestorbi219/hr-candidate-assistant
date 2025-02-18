@@ -28,7 +28,7 @@ entities:
 
 slots:
   experience:
-    type: text
+    type: float
     influence_conversation: true
     mappings:
       - type: from_entity
@@ -42,7 +42,7 @@ slots:
         entity: skills
 
   salary:
-    type: text
+    type: float
     influence_conversation: true
     mappings:
       - type: from_entity
@@ -64,6 +64,9 @@ forms:
       - salary
 
 responses:
+  utter_salary_confirm:
+    - text: "Спасибо, учёл вашу зарплатную ожидание: {salary} рублей."
+
 
   utter_ask_action:
     - text: "Что вы хотите сделать?"
