@@ -19,6 +19,8 @@ intents:
   - not_interested
   - no_experience
   - provide_info_again
+  - positive_answer
+  - negative_answer
 
 entities:
   - experience
@@ -33,13 +35,8 @@ slots:
     mappings:
       - type: from_entity
         entity: experience
-
-  skills:
-    type: list
-    influence_conversation: true
-    mappings:
-      - type: from_entity
-        entity: skills
+        intent: provide_experience
+        not_intent: provide_salary_expectation
 
   salary:
     type: float
@@ -47,6 +44,16 @@ slots:
     mappings:
       - type: from_entity
         entity: salary
+        intent: provide_salary_expectation
+        not_intent: provide_experience
+
+
+  skills:
+    type: list
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: skills
 
   role:
     type: text

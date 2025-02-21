@@ -45,7 +45,10 @@ rules:
           - salary
       - action: utter_salary_confirm
 
-
+  - rule: Пользователь прощается
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
 
 
 #  - rule: Обработать опыт работы пользователя

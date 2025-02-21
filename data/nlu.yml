@@ -1,8 +1,8 @@
 version: "3.1"
 
-regex_features:
-  - name: experience
-    pattern: "([0-9]+\\s?(год|лет|месяц|месяцев)?)"
+#regex_features:
+#  - name: experience
+#    pattern: "([0-9]+\\s?(год|лет|месяц|месяцев)?)"
 
 
 nlu:
@@ -71,6 +71,10 @@ nlu:
 
   - intent: provide_experience
     examples: |
+      - [2] (experience)
+      - [5] (experience)
+      - [7] (experience)
+      - [4] (experience)
       - [2 месяца](experience)
       - я работал [полтора года](experience)
       - [6 месяцев](experience) в компании
@@ -204,3 +208,67 @@ nlu:
       - Я новичок в этой сфере
       - Пока не работал в IT
       - Это моя первая работа
+
+  - synonym: "Data Scientist"
+    examples: |
+      - дата саентист
+      - дата ученый
+      - data scientist
+      - DS
+      - саентист
+  - synonym: "Data Engineer"
+    examples: |
+      - дата инженер
+      - data engineer
+      - инженер данных
+      - de
+  - synonym: "MLOps Engineer"
+    examples: |
+      - млопс инженер
+      - mlops
+      - инженер mlops
+  - synonym: "Project Manager"
+    examples: |
+      - проджект менеджер
+      - проектный менеджер
+      - pm
+      - руководитель проекта
+      
+
+  - intent: positive_answer
+    examples: |
+      - Да
+      - Конечно
+      - Верно
+      - Точно
+      - Абсолютно
+      - Ага
+      - Именно так
+      - Да, согласен
+      - Разумеется
+      - Безусловно
+      - Естественно
+      - Всё верно
+      - Да, правильно
+      - Да, это так
+      - Да, хочу
+      - Да, мне это подходит
+      - Да, давайте
+
+  - intent: negative_answer
+    examples: |
+      - Нет
+      - Неа
+      - Неправильно
+      - Ошибся
+      - Не согласен
+      - Это не так
+      - Нет, не хочу
+      - Нет, спасибо
+      - Нет, это мне не подходит
+      - Я против
+      - Не совсем
+      - Скорее нет
+      - Нет, отмена
+      - Нет, передумал
+      - Нет, не надо
