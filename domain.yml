@@ -77,15 +77,15 @@ responses:
 
   utter_ask_action:
     - text: "Что вы хотите сделать?"
-      buttons:
-        - title: "Оставить информацию о себе"
-          payload: "/provide_info"
-        - title: "Узнать о вакансиях"
-          payload: "/ask_about_roles"
-        - title: "Задать вопрос про компанию"
-          payload: "/ask_about_company"
-        - title: "Поговорить с HR"
-          payload: "/request_human"
+#      buttons:
+#        - title: "Оставить информацию о себе"
+#          payload: "/provide_info"
+#        - title: "Узнать о вакансиях"
+#          payload: "/ask_about_roles"
+#        - title: "Задать вопрос про компанию"
+#          payload: "/ask_about_company"
+#        - title: "Поговорить с HR"
+#          payload: "/request_human"
 
   utter_greet:
     - text: "Здравствуйте! Я HR-бот. Чем я могу вам помочь?"

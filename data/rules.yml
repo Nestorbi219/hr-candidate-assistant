@@ -8,11 +8,11 @@ rules:
       - action: utter_greet
       - action: utter_ask_action  # Бот сначала спрашивает, что делать
 
-  - rule: Активировать форму для сбора данных
-    steps:
-      - intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
+#  - rule: Активировать форму для сбора данных
+#    steps:
+#      - intent: provide_info
+#      - action: hr_form
+#      - active_loop: hr_form
 
   - rule: Ответить про вакансии
     steps:
@@ -24,26 +24,26 @@ rules:
       - intent: ask_about_company
       - action: utter_contact_hr  # Бот отвечает про компанию и ЖДЕТ ответа пользователя
 
-  - rule: Оценка кандидата после заполнения формы
-    condition:
-      - active_loop: hr_form
-    steps:
-      - action: hr_form
-      - active_loop: null
-      - action: action_evaluate_candidate
+#  - rule: Оценка кандидата после заполнения формы
+#    condition:
+#      - active_loop: hr_form
+#    steps:
+#      - action: hr_form
+#      - active_loop: null
+#      - action: action_evaluate_candidate
 
-  - rule: Обработать опыт работы
-    steps:
-      - intent: provide_experience
-      - slot_was_set:
-          - experience
+#  - rule: Обработать опыт работы
+#    steps:
+#      - intent: provide_experience
+#      - slot_was_set:
+#          - experience
 
-  - rule: Обработать зарплатные ожидания
-    steps:
-      - intent: provide_salary_expectation
-      - slot_was_set:
-          - salary
-      - action: utter_salary_confirm
+#  - rule: Обработать зарплатные ожидания
+#    steps:
+#      - intent: provide_salary_expectation
+#      - slot_was_set:
+#          - salary
+#      - action: utter_salary_confirm
 
   - rule: Пользователь прощается
     steps:

@@ -1,22 +1,23 @@
 version: "3.1"
 
 stories:
-  - story: Пользователь
+  - story: Пользователь просматривает доступные вакансии и подает заявку
     steps:
       - intent: greet
-      - actions: utter_greet
+      - action: utter_greet
+      - action: utter_ask_action
       - intent: ask_about_roles
-      - actions: utter_available_roles
+      - action: utter_available_roles
       - intent: provide_desired_role
-      - actions: utter_ask_skills
+      - action: utter_ask_skills
       - intent: provide_skills
-      - actions: utter_ask_experience
+      - action: utter_ask_experience
       - intent: provide_experience
-      - actions: utter_ask_salary
+      - action: utter_ask_salary
       - intent: provide_salary_expectation
-      - actions: action_evaluate_candidate
+      - action: action_evaluate_candidate
       - intent: goodbye
-      - actions: utter_goodbye
+      - action: utter_goodbye
 
   - story: Пользователь выбирает действие
     steps:
