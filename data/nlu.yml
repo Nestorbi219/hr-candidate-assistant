@@ -164,6 +164,10 @@ nlu:
       - [500000](salary)
       - Ожидаю [200000](salary) в месяц
       - Предлагаю [150000](salary)
+      - [120к](salary)
+      - [60к](salary)
+      - [150к](salary)
+      - [200к](salary)
 
   - intent: provide_desired_role
     examples: |
@@ -178,6 +182,10 @@ nlu:
       - Хотел бы быть [MLOps Engineer](role)
       - Интересует роль [Data Analyst](role)
       - Думаю, что мне подойдет [Data Engineer](role)
+      - хочу податься на [data scientist](role)
+      - хочу податься на [дата саентист](role)
+      - [mlops](role)
+      - [инженер млопс](role)
 
   - intent: ask_about_roles
     examples: |

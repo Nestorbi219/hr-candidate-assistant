@@ -90,8 +90,10 @@ class ActionExtractExperience(Action):
         if experience_years is None:
             dispatcher.utter_message("Не смог определить ваш опыт. Попробуйте сказать, например: '5 лет', '7 месяцев' или 'без опыта'.")
             return []
-
-        dispatcher.utter_message(f"Я понял, что у вас {experience_years} лет опыта.")
+        # if experience_years % 1.0 > 0:
+        #     dispatcher.utter_message(f"Я понял, что у вас {experience_years} лет опыта.")
+        # else:
+        #     dispatcher.utter_message(f"Я понял, что у вас {int(experience_years)} лет опыта.")
         return [SlotSet("experience", experience_years)]
 
 
@@ -149,6 +151,9 @@ def compute_similarity(candidate_skills, required_skills):
 
 
 def parse_salary(salary_str):
+
+    print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
+
     salary_str = salary_str.lower().strip()
 
     match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
@@ -189,6 +194,7 @@ class ActionExtractSalary(Action):
             return []
 
         dispatcher.utter_message(f"Я понял, что вы ожидаете зарплату {salary_amount} рублей.")
+        print("Зарплата: ", salary_amount)
         return [SlotSet("salary", salary_amount)]
 
 

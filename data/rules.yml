@@ -2,11 +2,11 @@
 version: "3.1"
 
 rules:
-#  - rule: Приветствие и выбор действия
-#    steps:
-#      - intent: greet
-#      - action: utter_greet
-#      - action: utter_ask_action  # Бот сначала спрашивает, что делать
+  - rule: Приветствие и выбор действия
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - action: utter_ask_action
 
   - rule: Активировать форму для сбора данных
     steps:
@@ -32,49 +32,42 @@ rules:
       - active_loop: null
       - action: action_evaluate_candidate
 
-  - rule: Обработать опыт работы
-    steps:
-      - intent: provide_experience
-      - slot_was_set:
-          - experience
+#  - rule: Обработать опыт работы
+#    steps:
+#      - intent: provide_experience
+#      - slot_was_set:
+#          - experience
 
   - rule: Обработать зарплатные ожидания
     steps:
       - intent: provide_salary_expectation
+      - action: action_extract_salary
       - slot_was_set:
-          - salary
-      - action: utter_salary_confirm
+        - salary
+      - action: action_evaluate_candidate
 
-  - rule: Очистка слотов и стартовый экран
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
+
+#  - rule: Очистка слотов и стартовый экран
+#    steps:
+#      - intent: greet
+#      - action: action_reset_slots
+#      - action: utter_greet
+#      - action: utter_ask_action
 
   - rule: Перезапуск бота
     steps:
       - intent: restart
+#      - action: action_reset_slots
       - action: action_restart
 
 
-#  - rule: Запуск бота
-#    steps:
-#      - intent: greet
-#      - action: utter_greet
-#      - intent: goodbye
-#      - action: utter_goodbye
+  - rule: Пользователь прощается
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
 
 
 #  - rule: Обработать опыт работы пользователя
 #    steps:
 #      - intent: provide_experience
 #      - action: action_extract_experience
-#
-#  - rule: Обработать зарплатные ожидания
-#    steps:
-#      - intent: provide_salary_expectation
-#      - action: action_extract_salary
-
-
-
