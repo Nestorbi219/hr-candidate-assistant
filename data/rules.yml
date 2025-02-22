@@ -62,6 +62,8 @@ rules:
 #    steps:
 #      - intent: greet
 #      - action: utter_greet
+#      - intent: goodbye
+#      - action: utter_goodbye
 
 
 #  - rule: Обработать опыт работы пользователя

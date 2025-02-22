@@ -1,6 +1,24 @@
 version: "3.1"
 
 stories:
+  - story: Пользователь просматривает доступные вакансии и подает заявку
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - action: utter_ask_action
+      - intent: ask_about_roles
+      - action: utter_available_roles
+      - intent: provide_desired_role
+      - action: utter_ask_skills
+      - intent: provide_skills
+      - action: utter_ask_experience
+      - intent: provide_experience
+      - action: utter_ask_salary
+      - intent: provide_salary_expectation
+      - action: action_evaluate_candidate
+      - intent: goodbye
+      - action: utter_goodbye
+
   - story: Пользователь выбирает действие
     steps:
       - intent: choose_action
@@ -32,9 +50,4 @@ stories:
 
       - user: "/goodbye"
         intent: goodbye
-      - action: utter_goodbye
-
-  - story: Пользователь прощается
-    steps:
-      - intent: goodbye
       - action: utter_goodbye
