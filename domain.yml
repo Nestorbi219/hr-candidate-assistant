@@ -70,6 +70,7 @@ responses:
 
   utter_ask_action:
     - text: "Что вы хотите сделать?"
+      button_type: vertical
       buttons:
         - title: "Оставить информацию о себе"
           payload: "/provide_info"
@@ -94,6 +95,7 @@ responses:
 
   utter_ask_role:
     - text: "На какую позицию вы хотите податься?"
+      button_type: vertical
       buttons:
         - title: "Data Scientist"
           payload: '/provide_desired_role{"role":"Data Scientist"}'
@@ -106,6 +108,9 @@ responses:
 
   utter_thank_you:
     - text: "Спасибо за информацию! Мы свяжемся с вами позже."
+      buttons:
+        - title: "🔄 Начать заново"
+          payload: "/greet"
 
   utter_goodbye:
     - text: "Всего доброго! Если будут вопросы, пишите."

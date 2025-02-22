@@ -2,11 +2,11 @@
 version: "3.1"
 
 rules:
-  - rule: Приветствие и выбор действия
-    steps:
-      - intent: greet
-      - action: utter_greet
-      - action: utter_ask_action  # Бот сначала спрашивает, что делать
+#  - rule: Приветствие и выбор действия
+#    steps:
+#      - intent: greet
+#      - action: utter_greet
+#      - action: utter_ask_action  # Бот сначала спрашивает, что делать
 
   - rule: Активировать форму для сбора данных
     steps:
@@ -45,7 +45,23 @@ rules:
           - salary
       - action: utter_salary_confirm
 
+  - rule: Очистка слотов и стартовый экран
+    steps:
+      - intent: greet
+      - action: action_reset_slots
+      - action: utter_greet
+      - action: utter_ask_action
 
+  - rule: Перезапуск бота
+    steps:
+      - intent: restart
+      - action: action_restart
+
+
+#  - rule: Запуск бота
+#    steps:
+#      - intent: greet
+#      - action: utter_greet
 
 
 #  - rule: Обработать опыт работы пользователя

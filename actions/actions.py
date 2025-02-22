@@ -10,7 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import gensim.downloader as api
 import re
 from rasa_sdk import Action
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, AllSlotsReset
 
 # Загружаем предобученные эмбеддинги
 word2vec_model = api.load("word2vec-google-news-300")
@@ -31,11 +31,14 @@ role_requirements = {
             "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
 }
 
+class ActionResetSlots(Action):
+    def name(self):
+        return "action_reset_slots"
+
+    def run(self, dispatcher, tracker, domain):
+        return [AllSlotsReset()]
 
 def parse_experience(experience_str):
-    """
-    Преобразует строку с опытом работы в число лет.
-    """
     experience_str = experience_str.lower().strip()
 
     if re.search(r"без опыта|новичок|только закончил", experience_str):
@@ -54,10 +57,15 @@ def parse_experience(experience_str):
     value = float(match.group(1).replace(",", "."))
     unit = match.group(2)
 
+    # ✅ Добавляем проверку: если значение слишком большое, это НЕ опыт работы
+    if value > 50:  # Люди не работают 200+ лет
+        return None
+
     if unit in ["месяц", "месяцев"]:
         return round(value / 12, 2)
 
     return value
+
 
 class ActionExtractExperience(Action):
     def name(self):
@@ -134,14 +142,14 @@ def compute_similarity(candidate_skills, required_skills):
 
 
 def parse_salary(salary_str):
-    """
-    Преобразует строку с зарплатой в число рублей.
-    """
     salary_str = salary_str.lower().strip()
 
     match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
 
     if not match:
+        value = re.search(r"\d{5,7}", salary_str)  # ✅ Поиск 5-7 значных чисел (обычные зарплаты)
+        if value:
+            return int(value.group(0))
         return None
 
     value = float(match.group(1).replace(",", "."))
@@ -237,6 +245,8 @@ class ActionEvaluateCandidate(Action):
         skill_similarity = compute_similarity(skills, required["required_skills"])
 
         print("kkkk", exp_ok, skill_similarity)
+
+
         if exp_ok and skill_similarity > 0.6:  # Порог 60% сходства
             print("Сходство :", skill_similarity)
             response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение."
@@ -244,6 +254,11 @@ class ActionEvaluateCandidate(Action):
             print("Сходство :", skill_similarity)
             response = f"К сожалению, вам пока не хватает опыта или навыков."
 
-        dispatcher.utter_message(text=response)
+        dispatcher.utter_message(
+            text=response,
+            buttons=[
+                {"title": "🔄 Начать заново", "payload": "/restart"}
+            ]
+        )
         return []
 

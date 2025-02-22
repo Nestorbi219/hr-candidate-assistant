@@ -10,6 +10,22 @@ nlu:
     examples: |
       - Привет
       - Здравствуйте
+      - Начать
+      - /start  
+
+  - intent: restart
+    examples: |
+      - начать заново
+      - перезапустить
+      - попробовать еще раз
+      - /restart
+      - хочу податься заново
+
+
+  - intent: greet
+    examples: |
+      - Привет
+      - Здравствуйте
       - Добрый день
       - Добрый вечер
       - Приветствую
@@ -86,6 +102,12 @@ nlu:
       - Без опыта, только закончил обучение
       - Опыт [2.5 года](experience) в машинном обучении
       - [Год](experience) назад начал карьеру
+      - intent: provide_experience
+      - [10](experience) лет в разработке
+      - [15](experience) в IT
+      - [20](experience) лет работаю
+
+      
 
   - intent: provide_skills
     examples: |
@@ -134,6 +156,10 @@ nlu:
       - [50000](salary)
       - [250000](salary)
       - [150к](salary)
+      - [300000](salary)
+      - [500000](salary)
+      - Ожидаю [200000](salary) в месяц
+      - Предлагаю [150000](salary)
 
   - intent: provide_desired_role
     examples: |
