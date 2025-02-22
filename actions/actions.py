@@ -22,6 +22,7 @@ synonyms = {
     "python": "programming",
     "tensorflow": "deep learning",
 }
+#
 
 role_requirements = {
             "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"]},
