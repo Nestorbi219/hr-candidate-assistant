@@ -11,6 +11,9 @@ import gensim.downloader as api
 import re
 from rasa_sdk import Action
 from rasa_sdk.events import SlotSet, AllSlotsReset
+import pandas as pd
+import os
+
 
 # Загружаем предобученные эмбеддинги
 word2vec_model = api.load("word2vec-google-news-300")
@@ -31,6 +34,9 @@ role_requirements = {
             "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"]},
             "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
 }
+
+
+
 
 class ActionResetSlots(Action):
     def name(self):
@@ -229,11 +235,10 @@ class ActionEvaluateCandidate(Action):
             return []
 
         try:
-            experience = int(parse_experience(experience))
+            experience = int(parse_experience(str(experience)))
         except ValueError:
             dispatcher.utter_message(text="Ошибка: Некорректный формат опыта работы.")
             return []
-
 
         if role not in role_requirements:
             dispatcher.utter_message(text="Ошибка: указанной роли не существует.")
@@ -245,15 +250,14 @@ class ActionEvaluateCandidate(Action):
         exp_ok = experience >= required["min_experience"]
         skill_similarity = compute_similarity(skills, required["required_skills"])
 
-        print("kkkk", exp_ok, skill_similarity)
+        if exp_ok and skill_similarity > 0.5:  # Порог 60% сходства
+            response = f"✅ Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение. Сходство: {skill_similarity:.2f}"
 
+            # ✅ Сохраняем кандидата в Excel
+            self.save_candidate_to_excel(role, experience, skills, salary)
 
-        if exp_ok and skill_similarity > 0.6:  # Порог 60% сходства
-            print("Сходство :", skill_similarity)
-            response = f"Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение."
         else:
-            print("Сходство :", skill_similarity)
-            response = f"К сожалению, вам пока не хватает опыта или навыков."
+            response = f"❌ К сожалению, вам пока не хватает опыта или навыков. Сходство: {skill_similarity:.2f}"
 
         dispatcher.utter_message(
             text=response,
@@ -262,4 +266,27 @@ class ActionEvaluateCandidate(Action):
             ]
         )
         return []
+
+    def save_candidate_to_excel(self, role, experience, skills, salary):
+        """Сохраняет данные подходящих кандидатов в Excel"""
+
+        file_path = "candidates_data.xlsx"
+
+        # Создаём DataFrame
+        new_data = pd.DataFrame([{
+            "Опыт (лет)": experience,
+            "Навыки": ", ".join(skills) if skills else "",
+            "Ожидания по зарплате": salary,
+            "Желаемая роль": role
+        }])
+
+        # Если файл уже есть, дописываем в него
+        if os.path.exists(file_path):
+            existing_data = pd.read_excel(file_path)
+            updated_data = pd.concat([existing_data, new_data], ignore_index=True)
+        else:
+            updated_data = new_data
+
+        # Сохраняем в Excel
+        updated_data.to_excel(file_path, index=False)
 
