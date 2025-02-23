@@ -182,7 +182,6 @@ actions:
   - action_extract_salary
   - action_extract_experience
   - action_reset_slots
-  - action_update_info
 
 
 session_config:
