@@ -2,12 +2,18 @@
 version: "3.1"
 
 rules:
-  - rule: Приветствие и выбор действия
+#  - rule: Приветствие и выбор действия
+#    steps:
+#      - intent: greet
+#      - action: utter_greet
+#      - action: utter_ask_action
+
+  - rule: Очистка слотов и стартовый экран
     steps:
       - intent: greet
+      - action: action_reset_slots
       - action: utter_greet
       - action: utter_ask_action
-
   - rule: Активировать форму для сбора данных
     steps:
       - intent: provide_info
@@ -48,18 +54,19 @@ rules:
       - action: action_evaluate_candidate
 
 
-#  - rule: Очистка слотов и стартовый экран
-#    steps:
-#      - intent: greet
-#      - action: action_reset_slots
-#      - action: utter_greet
-#      - action: utter_ask_action
+  - rule: Очистка слотов и стартовый экран
+    steps:
+      - intent: greet
+      - action: action_reset_slots
+      - action: utter_greet
+      - action: utter_ask_action
 
   - rule: Перезапуск бота
     steps:
       - intent: restart
 #      - action: action_reset_slots
       - action: action_restart
+      - action: utter_ask_action
 
 
   - rule: Пользователь прощается
