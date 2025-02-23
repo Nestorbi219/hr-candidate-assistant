@@ -67,6 +67,11 @@ rules:
       - action: utter_goodbye
 
 
+  - rule: Пользователь хочет обновить данные
+    steps:
+        - intent: update_info
+        - action: action_update_inf
+
 #  - rule: Обработать опыт работы пользователя
 #    steps:
 #      - intent: provide_experience

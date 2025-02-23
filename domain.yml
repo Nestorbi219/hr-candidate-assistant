@@ -21,6 +21,8 @@ intents:
   - provide_info_again
   - positive_answer
   - negative_answer
+  - stop
+  - update_info
 
 entities:
   - experience
@@ -37,6 +39,9 @@ slots:
         entity: experience
         intent: provide_experience
         not_intent: provide_salary_expectation
+        conditions:
+        - active_loop: hr_form
+          requested_slot: experience
 
   salary:
     type: float
@@ -46,6 +51,9 @@ slots:
         entity: salary
         intent: provide_salary_expectation
         not_intent: provide_experience
+        conditions:
+        - active_loop: hr_form
+          requested_slot: salary
 
 
   skills:
@@ -87,17 +95,20 @@ responses:
           payload: "/request_human"
 
   utter_greet:
-    - text: '''Здравствуйте! Я HR-бот.
-     
-      Мы - TechNova Solutions, динамично развивающаяся IT-компания, специализирующаяся на разработке высокотехнологичных решений в сфере искусственного интеллекта, обработки данных и облачных вычислений. Мы создаем интеллектуальные системы для автоматизации бизнеса, аналитики данных и кибербезопасности.
-      🔹 Основные направления работы:
+    - text: |
+        Здравствуйте! Я HR-бот.
       
-      Разработка AI-решений и машинного обучения
-      Big Data и аналитика данных
-      Разработка веб- и мобильных приложений
-      Кибербезопасность и защита данных
-      Облачные технологии и DevOps
-      Мы ищем талантливых IT-специалистов, готовых работать с передовыми технологиями, решать сложные задачи и развиваться в инновационной среде!'''
+        Мы - TechNova Solutions, динамично развивающаяся IT-компания, специализирующаяся на разработке высокотехнологичных решений в сфере искусственного интеллекта, обработки данных и облачных вычислений. Мы создаем интеллектуальные системы для автоматизации бизнеса, аналитики данных и кибербезопасности.
+        
+        **Основные направления работы:**
+        
+        🔹Разработка AI-решений и машинного обучения
+        🔹Big Data и аналитика данных
+        🔹Разработка веб- и мобильных приложений
+        🔹Кибербезопасность и защита данных
+        🔹Облачные технологии и DevOps
+        
+        Мы ищем талантливых IT-специалистов, готовых работать с передовыми технологиями, решать сложные задачи и развиваться в инновационной среде!
 
   utter_ask_experience:
     - text: "Сколько лет опыта у вас в сфере IT?"
@@ -152,9 +163,18 @@ responses:
 #        - title: "Ничего, спасибо"
 #          payload: "/goodbye"
 
+  utter_ask_continue:
+    - text: "Вы точно хотите остановить заполнение формы?"
 
   utter_not_sure:
     - text: "Хорошо, если что-то неясно, дайте знать!"
+
+  utter_ask_what_to_update:
+    - text: "Что именно вы хотите исправить? (роль, опыт, навыки, зарплату?)"
+
+  utter_update_confirmation:
+    - text: "Я обновил вашу информацию. Нужно что-то еще изменить?"
+
 
 actions:
   - action_save_candidate_data
@@ -162,6 +182,8 @@ actions:
   - action_extract_salary
   - action_extract_experience
   - action_reset_slots
+  - action_update_info
+
 
 session_config:
   session_expiration_time: 60
