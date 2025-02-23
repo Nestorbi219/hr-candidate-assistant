@@ -44,6 +44,13 @@ role_requirements = {
 }
 
 
+class ActionResetSlots(Action):
+    def name(self):
+        return "action_reset_slots"
+
+    def run(self, dispatcher, tracker, domain):
+        return [AllSlotsReset()]
+
 def parse_experience(experience_str):
     experience_str = experience_str.lower().strip()
 
@@ -71,38 +78,6 @@ def parse_experience(experience_str):
         return round(value / 12, 2)
 
     return value
-
-def parse_salary(salary_str):
-
-    print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
-
-    salary_str = salary_str.lower().strip()
-
-    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
-
-    if not match:
-        value = re.search(r"\d{5,7}", salary_str)  # ✅ Поиск 5-7 значных чисел (обычные зарплаты)
-        if value:
-            return int(value.group(0))
-        return None
-
-    value = float(match.group(1).replace(",", "."))
-    unit = match.group(2)
-
-    if unit in ["к", "тыс", "тысяч"]:
-        return int(value * 1000)
-    elif unit in ["млн", "миллион"]:
-        return int(value * 1000000)
-
-    return int(value)
-
-class ActionResetSlots(Action):
-    def name(self):
-        return "action_reset_slots"
-
-    def run(self, dispatcher, tracker, domain):
-        return [AllSlotsReset()]
-
 
 
 class ActionExtractExperience(Action):
@@ -139,25 +114,15 @@ def normalize_skill(skill):
 
 def get_word_embedding(word):
     """
-    Получает эмбеддинг слова, обрабатывает синонимы и разбивает составные слова.
+    Получает вектор слова из Word2Vec.
+    Если слова нет, возвращает нулевой вектор.
     """
-    word = word.lower().strip()
-    word = synonyms.get(word, word)  # Подмена синонима
-
-    # Если слово есть в модели FastText — используем его
-    if word in model:
-        return model[word]
-
-    # Если слово составное (CI/CD, ETL-пайплайн), разбиваем и усредняем эмбеддинги
-    if "/" in word or "-" in word or "_" in word:
-        parts = re.split(r"[/\-_]", word)  # Разбиваем по разделителям
-        vectors = [model[p] for p in parts if p in model]
-        if vectors:
-            return np.mean(vectors, axis=0)  # Усредняем векторы частей слова
-
-    # Если слово совсем неизвестно, возвращаем нулевой вектор
-    print(f"[WARNING] Слово '{word}' отсутствует в FastText!")
-    return np.zeros(300)
+    word = word.lower()  # Приводим к lowercase
+    try:
+        return word2vec_model[word]
+    except KeyError:
+        print(f"[WARNING] Слово '{word}' отсутствует в модели Word2Vec!")
+        return np.zeros(300)  # Размер вектора 300
 
 
 def compute_similarity(candidate_skills, required_skills):
@@ -191,7 +156,29 @@ def compute_similarity(candidate_skills, required_skills):
     return np.mean(similarities) if similarities else 0
 
 
+def parse_salary(salary_str):
 
+    print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
+
+    salary_str = salary_str.lower().strip()
+
+    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
+
+    if not match:
+        value = re.search(r"\d{5,7}", salary_str)  # ✅ Поиск 5-7 значных чисел (обычные зарплаты)
+        if value:
+            return int(value.group(0))
+        return None
+
+    value = float(match.group(1).replace(",", "."))
+    unit = match.group(2)
+
+    if unit in ["к", "тыс", "тысяч"]:
+        return int(value * 1000)
+    elif unit in ["млн", "миллион"]:
+        return int(value * 1000000)
+
+    return int(value)
 
 
 class ActionExtractSalary(Action):
