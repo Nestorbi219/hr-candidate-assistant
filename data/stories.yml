@@ -29,6 +29,19 @@ stories:
       - intent: goodbye
       - action: utter_goodbye
 
+#  - story: Пользователь хочет заново запустить
+#    steps:
+#      - intent: greet
+#      - action: utter_greet
+#      - action: utter_ask_action
+#      - intent: provide_info
+#      - action: hr_form
+#      - active_loop: hr_form
+#      - active_loop: null
+#      - action: action_evaluate_candidate
+#      - intent: restart
+#      - action: action_restart
+#      - action: utter_ask_action
 
 #  - story: Пользователь хочет поменять данные в заявке TODO Добавить данный диалог
 

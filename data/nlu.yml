@@ -6,12 +6,86 @@ version: "3.1"
 
 
 nlu:
+  - synonym: "Data Analyst"
+    examples: |
+      - дата аналитик
+      - аналитик данных
+      - да
+      - data analyst
+      - dataanalyst
+      - analyst
+      - da
+  - synonym: "Data Scientist"
+    examples: |
+      - дата саентиста
+      - дата саентист
+      - дата ученый
+      - датасаентист
+      - datascientist
+      - data scientist
+      - DS
+      - саентист
+      - саентиста
+  - synonym: "Data Engineer"
+    examples: |
+      - датаинженер
+      - жатаинженера
+      - дата инженера
+      - дата инженер
+      - data engineer
+      - инженер данных
+      - de
+  - synonym: "MLOps Engineer"
+    examples: |
+      - млопсинженер
+      - млпосинженера
+      - мл
+      - млопс инженер
+      - mlops
+      - инженер mlops
+  - synonym: "Project Manager"
+    examples: |
+      - руководитель
+      - проджект менеджер
+      - проектный менеджер
+      - pm
+      - руководитель проекта
+  - synonym: "SQL"
+    examples: |
+      - postgres
+      - postgresql
+      - mysql
+  - synonym: "Python"
+    examples: |
+      - питон
+      - py
+      - python
+      - piton
+      - пи
+      - пайтон
+      - пай
+  - synonym: "Pandas"
+    examples: |
+      - пандас
+      - panda
+
   - intent: greet
     examples: |
       - Привет
       - Здравствуйте
       - Начать
-      - /start  
+      - /start
+      - Добрый день
+      - Добрый вечер
+      - Доброе утро
+      - hello
+      - hi
+      - хелло
+      - хай
+      - прив
+      - Здравствуй
+      - приветствую
+      - Здорово
 
   - intent: restart
     examples: |
@@ -20,16 +94,6 @@ nlu:
       - попробовать еще раз
       - /restart
       - хочу податься заново
-
-
-  - intent: greet
-    examples: |
-      - Привет
-      - Здравствуйте
-      - Добрый день
-      - Добрый вечер
-      - Приветствую
-      - Здорово
 
   - intent: provide_info_again
     examples: |
@@ -146,6 +210,17 @@ nlu:
       - Опыт управления командой разработчиков
       - Знаю, как вести [roadmap](skills) и [backlog](skills)
       - Умею организовывать [спринты](skills) и ретроспективы
+      
+      # Data Analyst
+      - Владею [SQL](skills) и [Excel](skills)
+      - Опыт работы с [BI](skills)-инструментами, такими как [Tableau](skills) и Power [BI](skills)
+      - Хорошо разбираюсь в [A/B](skills) тестировании
+      - Анализирую данные с помощью [Pandas](skills) и [NumPy](skills)
+      - Использую [Python](skills) для обработки данных и автоматизации отчетов
+      - Опыт работы с [PostgreSQL](skills) и [MySQL](skills)
+      - Разрабатываю дашборды в [Tableau](skills) и Power [BI](skills)
+      - Использую [Excel](skills) для финансового моделирования
+      - Опыт работы с [ETL](skills)-процессами и обработкой данных
 
 
   - intent: provide_salary_expectation
@@ -171,7 +246,7 @@ nlu:
 
   - intent: provide_desired_role
     examples: |
-      - Меня заинтересовала позиция[проджект менеджера](role)
+      - Меня заинтересовала позиция [проджект менеджера](role)
       - [пм](role)
       - [дата аналитик](role) идеальная для меня позиция
       - подаюсь к вам на [дата инженера](role)
@@ -186,6 +261,15 @@ nlu:
       - хочу податься на [дата саентист](role)
       - [mlops](role)
       - [инженер млопс](role)
+      - Хочу работать [дата ученым](role)
+      - Рассматриваю позицию [ds](role)
+      - Интересует [de](role)
+      - Хотел бы податься на [инженер данных](role)
+      - Думаю, мне подойдет [руководитель проекта](role)
+      - Могу занять роль [pm](role)
+      - Хочу попробовать себя в [продуктовом управлении](role)
+      - Ищу позицию [ml-инженера](role)
+      - Хочу работать [в DevOps](role)
 
   - intent: ask_about_roles
     examples: |
@@ -242,32 +326,6 @@ nlu:
       - Я новичок в этой сфере
       - Пока не работал в IT
       - Это моя первая работа
-
-  - synonym: "Data Scientist"
-    examples: |
-      - дата саентист
-      - дата ученый
-      - data scientist
-      - DS
-      - саентист
-  - synonym: "Data Engineer"
-    examples: |
-      - дата инженер
-      - data engineer
-      - инженер данных
-      - de
-  - synonym: "MLOps Engineer"
-    examples: |
-      - млопс инженер
-      - mlops
-      - инженер mlops
-  - synonym: "Project Manager"
-    examples: |
-      - проджект менеджер
-      - проектный менеджер
-      - pm
-      - руководитель проекта
-      
 
   - intent: positive_answer
     examples: |
