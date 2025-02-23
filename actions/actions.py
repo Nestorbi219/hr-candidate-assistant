@@ -31,7 +31,7 @@ role_requirements = {
             "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"]},
             "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"]},
             "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"]},
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas"]},
+            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas", "ETL"]},
 }
 
 
@@ -292,37 +292,3 @@ class ActionEvaluateCandidate(Action):
 
         # Сохраняем в Excel
         updated_data.to_excel(file_path, index=False)
-
-
-class ActionUpdateInfo(Action):
-    def name(self):
-        return "action_update_info"
-
-    def run(self, dispatcher, tracker, domain):
-        # Получаем последнее сообщение пользователя
-        user_message = tracker.latest_message.get("text").lower()
-
-        # Определяем, какие данные хочет обновить пользователь
-        updated_slots = []
-
-        if "роль" in user_message:
-            dispatcher.utter_message(text="На какую роль вы хотите податься?")
-            updated_slots.append(SlotSet("role", None))
-
-        if "опыт" in user_message:
-            dispatcher.utter_message(text="Какой у вас теперь опыт работы?")
-            updated_slots.append(SlotSet("experience", None))
-
-        if "навыки" in user_message:
-            dispatcher.utter_message(text="Какие навыки вы хотите добавить или изменить?")
-            updated_slots.append(SlotSet("skills", None))
-
-        if "зарплату" in user_message:
-            dispatcher.utter_message(text="Какую зарплату вы теперь ожидаете?")
-            updated_slots.append(SlotSet("salary", None))
-
-        if updated_slots:
-            return updated_slots  # Возвращает только измененные слоты
-        else:
-            dispatcher.utter_message(text="Я не понял, что именно вы хотите изменить. Уточните, пожалуйста.")
-            return []

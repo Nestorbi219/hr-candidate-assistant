@@ -32,11 +32,12 @@ rules:
       - active_loop: null
       - action: action_evaluate_candidate
 
-#  - rule: Обработать опыт работы
-#    steps:
-#      - intent: provide_experience
-#      - slot_was_set:
-#          - experience
+  - rule: Обработать опыт работы
+    steps:
+      - intent: provide_experience
+      - action: action_extract_experience
+      - slot_was_set:
+        - experience
 
   - rule: Обработать зарплатные ожидания
     steps:

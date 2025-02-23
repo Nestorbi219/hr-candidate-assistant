@@ -5,7 +5,6 @@ intents:
   - goodbye
   - thank_you
   - choose_action
-  - provide_name
   - provide_info
   - provide_experience 
   - provide_skills
@@ -21,8 +20,6 @@ intents:
   - provide_info_again
   - positive_answer
   - negative_answer
-  - stop
-  - update_info
 
 entities:
   - experience
@@ -100,7 +97,7 @@ responses:
       
         Мы - TechNova Solutions, динамично развивающаяся IT-компания, специализирующаяся на разработке высокотехнологичных решений в сфере искусственного интеллекта, обработки данных и облачных вычислений. Мы создаем интеллектуальные системы для автоматизации бизнеса, аналитики данных и кибербезопасности.
         
-        **Основные направления работы:**
+        Основные направления работы:
         
         🔹Разработка AI-решений и машинного обучения
         🔹Big Data и аналитика данных
@@ -123,6 +120,8 @@ responses:
     - text: "На какую позицию вы хотите податься?"
       button_type: vertical
       buttons:
+        - title: "Data Analyst"
+          payload: '/provide_desired_role{"role":"Data Analyst"}'
         - title: "Data Scientist"
           payload: '/provide_desired_role{"role":"Data Scientist"}'
         - title: "Data Engineer"
@@ -136,7 +135,7 @@ responses:
     - text: "Спасибо за информацию! Мы свяжемся с вами позже."
       buttons:
         - title: "🔄 Начать заново"
-          payload: "/greet"
+          payload: "/restart"
 
   utter_goodbye:
     - text: "Всего доброго! Если будут вопросы, пишите."
@@ -182,7 +181,6 @@ actions:
   - action_extract_salary
   - action_extract_experience
   - action_reset_slots
-  - action_update_info
 
 
 session_config:

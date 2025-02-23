@@ -29,18 +29,19 @@ stories:
       - intent: goodbye
       - action: utter_goodbye
 
-  - story: Пользователь хочет изменить данные в заявке
-    steps:
-      - intent: update_info
-      - action: utter_ask_what_to_update
-      - intent: provide_desired_role
-      - action: utter_update_confirmation
-      - intent: provide_experience
-      - action: utter_update_confirmation
-      - intent: provide_skills
-      - action: utter_update_confirmation
-      - intent: provide_salary_expectation
-      - action: utter_update_confirmation
+#  - story: Пользователь хочет заново запустить
+#    steps:
+#      - intent: greet
+#      - action: utter_greet
+#      - action: utter_ask_action
+#      - intent: provide_info
+#      - action: hr_form
+#      - active_loop: hr_form
+#      - active_loop: null
+#      - action: action_evaluate_candidate
+#      - intent: restart
+#      - action: action_restart
+#      - action: utter_ask_action
 
 #  - story: Пользователь хочет поменять данные в заявке TODO Добавить данный диалог
 
