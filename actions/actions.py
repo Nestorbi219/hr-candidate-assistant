@@ -13,10 +13,11 @@ from rasa_sdk import Action
 from rasa_sdk.events import SlotSet, AllSlotsReset
 import pandas as pd
 import os
+import requests
 
 
 # Загружаем предобученные эмбеддинги
-word2vec_model = api.load("word2vec-google-news-300")
+word2vec_model = api.load("fasttext-wiki-news-subwords-300")
 
 
 synonyms = {
@@ -24,23 +25,24 @@ synonyms = {
     "sql": "database",
     "python": "programming",
     "tensorflow": "deep learning",
+    "pytorch": "deep learning",
+    "etl": "data pipeline",
+    "ci/cd": "continuous integration",
+    "kubernetes": "container orchestration",
+    "mlflow": "machine learning pipeline",
+    "prometheus": "monitoring system",
+    "torchserve": "deep learning serving"
 }
+
 
 role_requirements = {
-            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"]},
-            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"]},
-            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"]},
-            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"]},
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas", "ETL"]},
+            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas", "ETL"], "max_salary": 180000},
+            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"], "max_salary": 250000},
+            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"], "max_salary": 230000},
+            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"], "max_salary": 240000},
+            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"], "max_salary": 200000}
 }
 
-
-class ActionResetSlots(Action):
-    def name(self):
-        return "action_reset_slots"
-
-    def run(self, dispatcher, tracker, domain):
-        return [AllSlotsReset()]
 
 def parse_experience(experience_str):
     experience_str = experience_str.lower().strip()
@@ -69,6 +71,38 @@ def parse_experience(experience_str):
         return round(value / 12, 2)
 
     return value
+
+def parse_salary(salary_str):
+
+    print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
+
+    salary_str = salary_str.lower().strip()
+
+    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
+
+    if not match:
+        value = re.search(r"\d{5,7}", salary_str)  # ✅ Поиск 5-7 значных чисел (обычные зарплаты)
+        if value:
+            return int(value.group(0))
+        return None
+
+    value = float(match.group(1).replace(",", "."))
+    unit = match.group(2)
+
+    if unit in ["к", "тыс", "тысяч"]:
+        return int(value * 1000)
+    elif unit in ["млн", "миллион"]:
+        return int(value * 1000000)
+
+    return int(value)
+
+class ActionResetSlots(Action):
+    def name(self):
+        return "action_reset_slots"
+
+    def run(self, dispatcher, tracker, domain):
+        return [AllSlotsReset()]
+
 
 
 class ActionExtractExperience(Action):
@@ -105,15 +139,25 @@ def normalize_skill(skill):
 
 def get_word_embedding(word):
     """
-    Получает вектор слова из Word2Vec.
-    Если слова нет, возвращает нулевой вектор.
+    Получает эмбеддинг слова, обрабатывает синонимы и разбивает составные слова.
     """
-    word = word.lower()  # Приводим к lowercase
-    try:
-        return word2vec_model[word]
-    except KeyError:
-        print(f"[WARNING] Слово '{word}' отсутствует в модели Word2Vec!")
-        return np.zeros(300)  # Размер вектора 300
+    word = word.lower().strip()
+    word = synonyms.get(word, word)  # Подмена синонима
+
+    # Если слово есть в модели FastText — используем его
+    if word in model:
+        return model[word]
+
+    # Если слово составное (CI/CD, ETL-пайплайн), разбиваем и усредняем эмбеддинги
+    if "/" in word or "-" in word or "_" in word:
+        parts = re.split(r"[/\-_]", word)  # Разбиваем по разделителям
+        vectors = [model[p] for p in parts if p in model]
+        if vectors:
+            return np.mean(vectors, axis=0)  # Усредняем векторы частей слова
+
+    # Если слово совсем неизвестно, возвращаем нулевой вектор
+    print(f"[WARNING] Слово '{word}' отсутствует в FastText!")
+    return np.zeros(300)
 
 
 def compute_similarity(candidate_skills, required_skills):
@@ -126,13 +170,13 @@ def compute_similarity(candidate_skills, required_skills):
     for skill in candidate_skills:
         normalized_skill = normalize_skill(skill)
         vec = get_word_embedding(normalized_skill)
-        if np.any(vec):  
+        if np.any(vec):
             candidate_vectors.append(vec)
 
     for skill in required_skills:
         normalized_skill = normalize_skill(skill)
         vec = get_word_embedding(normalized_skill)
-        if np.any(vec):  
+        if np.any(vec):
             required_vectors.append(vec)
 
     if not candidate_vectors or not required_vectors:
@@ -147,29 +191,7 @@ def compute_similarity(candidate_skills, required_skills):
     return np.mean(similarities) if similarities else 0
 
 
-def parse_salary(salary_str):
 
-    print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
-
-    salary_str = salary_str.lower().strip()
-
-    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
-
-    if not match:
-        value = re.search(r"\d{5,7}", salary_str)  # ✅ Поиск 5-7 значных чисел (обычные зарплаты)
-        if value:
-            return int(value.group(0))
-        return None
-
-    value = float(match.group(1).replace(",", "."))
-    unit = match.group(2)
-
-    if unit in ["к", "тыс", "тысяч"]:
-        return int(value * 1000)
-    elif unit in ["млн", "миллион"]:
-        return int(value * 1000000)
-
-    return int(value)
 
 
 class ActionExtractSalary(Action):
@@ -228,6 +250,7 @@ class ActionEvaluateCandidate(Action):
             tracker: Tracker,
             domain: dict) -> list:
 
+        user_id = tracker.sender_id
         role = tracker.get_slot("role")
         experience = tracker.get_slot("experience")
         skills = tracker.get_slot("skills")
@@ -257,10 +280,10 @@ class ActionEvaluateCandidate(Action):
             response = f"✅ Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение. Сходство: {skill_similarity:.2f}"
 
             # ✅ Сохраняем кандидата в Excel
-            self.save_candidate_to_excel(role, experience, skills, salary)
-
+            self.save_candidate_to_excel(user_id, role, experience, skills, salary)
         else:
             response = f"❌ К сожалению, вам пока не хватает опыта или навыков. Сходство: {skill_similarity:.2f}"
+
 
         dispatcher.utter_message(
             text=response,
@@ -270,25 +293,43 @@ class ActionEvaluateCandidate(Action):
         )
         return []
 
-    def save_candidate_to_excel(self, role, experience, skills, salary):
+    def get_telegram_user_info(self, user_id):
+        """Получает username пользователя Telegram через API"""
+        TELEGRAM_BOT_TOKEN = "REDACTED_TELEGRAM_TOKEN"  # Замени на свой токен бота
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getChat?chat_id={user_id}"
+
+        try:
+            response = requests.get(url)
+            data = response.json()
+            if data.get("ok"):
+                username = data["result"].get("username")
+                return f"@{username}" if username else "Неизвестный"
+        except Exception as e:
+            print(f"Ошибка получения Telegram username: {e}")
+
+        return "Ошибка"
+
+    def save_candidate_to_excel(self, user_id, role, experience, skills, salary):
         """Сохраняет данные подходящих кандидатов в Excel"""
 
-        file_path = "candidates_data.xlsx"
+        file_path = os.path.join("C:\\Users\\Egor Vegel\\Desktop\\RasaProject", "candidates.xlsx")
+        user_name = self.get_telegram_user_info(user_id)
 
         # Создаём DataFrame
         new_data = pd.DataFrame([{
+            "telegram": user_name,
             "Опыт (лет)": experience,
             "Навыки": ", ".join(skills) if skills else "",
             "Ожидания по зарплате": salary,
             "Желаемая роль": role
         }])
 
-        # Если файл уже есть, дописываем в него
-        if os.path.exists(file_path):
-            existing_data = pd.read_excel(file_path)
+        # Загружаем существующий файл, если он есть
+        try:
+            existing_data = pd.read_excel(file_path, engine="openpyxl")
             updated_data = pd.concat([existing_data, new_data], ignore_index=True)
-        else:
+        except FileNotFoundError:
             updated_data = new_data
 
-        # Сохраняем в Excel
-        updated_data.to_excel(file_path, index=False)
+        # Сохраняем обновленные данные
+        updated_data.to_excel(file_path, index=False, engine="openpyxl")

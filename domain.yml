@@ -141,8 +141,65 @@ responses:
     - text: "Всего доброго! Если будут вопросы, пишите."
 
   utter_available_roles:
-    - text: "У нас есть открытые позиции: Data Scientist, Data Engineer, MLOps, Project Manager, Data Analyst. Что вы хотите сделать дальше?"
-#      buttons:
+    - text: |
+        1. Data Scientist 
+        📌 Чем занимается:
+        - Разрабатывает и обучает модели машинного обучения (ML)
+        - Анализирует большие объемы данных, выявляет закономерности
+        - Разрабатывает предсказательные модели и системы рекомендаций
+        - Работает с нейросетями, NLP, компьютерным зрением  
+        🔹 Требуемые навыки: 
+        Python, SQL, TensorFlow/PyTorch, Pandas, NumPy, Matplotlib,  
+        Статистика и математическое моделирование, Навыки работы с Big Data
+        
+        2. Data Engineer
+        📌 Чем занимается:
+        - Разрабатывает ETL-пайплайны для обработки данных
+        - Проектирует базы данных и хранилища (DWH)
+        - Работает с потоковой обработкой данных
+        - Оптимизирует работу с Big Data
+        🔹 Требуемые навыки:      
+        SQL, Python, Spark, Airflow, PostgreSQL, ClickHouse, Hadoop, API и REST, Kafka, DevOps-инструменты (Docker, Kubernetes)
+        
+        3. MLOps Engineer
+        📌 Чем занимается:
+        - Автоматизирует процесс развертывания и поддержки ML-моделей
+        - Оптимизирует и мониторит ML-системы в продакшене
+        - Работает с CI/CD для моделей машинного обучения
+        - Настраивает логирование и алертинг
+        🔹 Требуемые навыки:      
+        Docker, Kubernetes, CI/CD (GitLab, Jenkins), MLFlow, Kubeflow, Python, Bash, Работа с облаками (AWS, GCP, Azure)      
+        
+        4. Project Manager
+        📌 Чем занимается:
+        - Ведет IT-проекты, контролирует их выполнение
+        - Управляет командой разработчиков и аналитиков
+        - Определяет сроки и ресурсы проекта
+        - Взаимодействует с бизнес-заказчиками
+        🔹 Требуемые навыки:      
+        Agile/Scrum/Kanban, Управление рисками, дедлайнами, Навыки общения и работы с командой, Jira, Trello, Confluence       
+        
+        5. Data Analyst
+        📌 Чем занимается:
+        - Анализирует данные и создает отчеты
+        - Работает с BI-инструментами и SQL
+        - Помогает бизнесу принимать решения на основе данных
+        - Создает дашборды и визуализации
+        🔹 Требуемые навыки:      
+        SQL, Python, Excel, BI-инструменты (Power BI, Tableau), Статистика и A/B-тесты, Работа с хранилищами данных
+      button_type: vertical
+      buttons:
+        - title: "Data Analyst"
+        - payload: '/provide_desired_role{"role":"Data Analyst"}'
+        - title: "Data Scientist"
+          payload: '/provide_desired_role{"role":"Data Scientist"}'
+        - title: "Data Engineer"
+          payload: '/provide_desired_role{"role":"Data Engineer"}'
+        - title: "MLOps Engineer"
+          payload: '/provide_desired_role{"role":"MLOps Engineer"}'
+        - title: "Project Manager"
+          payload: '/provide_desired_role{"role":"Project Manager"}'
+      #      buttons:
 #        - title: "Оставить информацию о себе"
 #          payload: "/provide_info"
 #        - title: "Узнать о компании"
