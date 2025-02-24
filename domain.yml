@@ -59,6 +59,7 @@ slots:
     mappings:
       - type: from_entity
         entity: skills
+        intent: provide_skills
 
   role:
     type: text
@@ -66,6 +67,7 @@ slots:
     mappings:
       - type: from_entity
         entity: role
+
 
 forms:
   hr_form:

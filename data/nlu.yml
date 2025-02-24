@@ -87,6 +87,7 @@ nlu:
       - хранилище данных
       - хд
       - хранилищем данных
+      - dwh
 
   - intent: greet
     examples: |
@@ -206,6 +207,15 @@ nlu:
       - Работаю с [pandas](skills), [NumPy](skills), [scikit-learn](skills)
       - Знаком с [A/B тестированием](skills) и [статистикой](skills)
       - Анализ данных с помощью [Jupyter Notebook](skills)
+      - [deep](skills) [learning](skills)
+      - Имею Опыт работы с [data warehouse](skills)
+      - Имею Опыт работы с [dwh](skills)
+      - дата [warehouse](skills)
+      - [continuous integration](skills)
+      - [machine learning pipeline](skills)
+      - [restapi]
+      - работал с [restAPI]
+      
 
       # Data Engineer
       - Опыт работы с [Spark](skills) и [Hadoop](skills)
