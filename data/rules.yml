@@ -21,6 +21,13 @@ rules:
       - action: hr_form
       - active_loop: hr_form
 
+  - rule: Начать сбор информации после выбора роли
+    steps:
+      - intent: provide_desired_role
+      - action: hr_form
+      - active_loop: hr_form
+
+
   - rule: Ответить про вакансии
     steps:
       - intent: ask_about_roles

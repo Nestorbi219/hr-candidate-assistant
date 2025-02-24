@@ -190,7 +190,7 @@ responses:
       button_type: vertical
       buttons:
         - title: "Data Analyst"
-        - payload: '/provide_desired_role{"role":"Data Analyst"}'
+          payload: '/provide_desired_role{"role":"Data Analyst"}'
         - title: "Data Scientist"
           payload: '/provide_desired_role{"role":"Data Scientist"}'
         - title: "Data Engineer"

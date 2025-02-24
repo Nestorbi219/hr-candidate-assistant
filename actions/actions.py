@@ -15,6 +15,7 @@ import pandas as pd
 import os
 import requests
 
+from actions.evaluate_salary import evaluate_salary
 
 # Загружаем предобученные эмбеддинги
 model = api.load("fasttext-wiki-news-subwords-300")
@@ -33,25 +34,20 @@ synonyms = {
     "torchserve": "deep learning serving",
     "clickhouse": "databases",
     "restapi": "api",
-    "data warehouse": "warehouse"
+    "data warehouse": "warehouse",
+    "a/b": "ab testing",
+    "ab": "ab testing"
 }
 
 
 role_requirements = {
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "A/B", "Warehouse"], "max_salary": 180000},
-            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "deep", "learning", "Pandas", "Numpy", "Scikit-learn"], "max_salary": 250000},
-            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Databases", "Docker", "API"], "max_salary": 230000},
+            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "A/B"], "max_salary": 200000},
+            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "deep", "learning", "Pandas", "Numpy", "Scikit-learn"], "max_salary": 270000},
+            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Databases", "Docker", "API"], "max_salary": 250000},
             "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "continuous integration", "prometheus", "machine learning pipeline", "Bash", "KubeFlow"], "max_salary": 240000},
-            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "Trello", "Confluence"], "max_salary": 300000}
+            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "Trello", "Confluence"], "max_salary": 200000}
 }
 
-
-class ActionResetSlots(Action):
-    def name(self):
-        return "action_reset_slots"
-
-    def run(self, dispatcher, tracker, domain):
-        return [AllSlotsReset()]
 
 def parse_experience(experience_str):
     experience_str = experience_str.lower().strip()
@@ -82,83 +78,6 @@ def parse_experience(experience_str):
     print("Опыт: ", value)
     return float(value)
 
-
-class ActionExtractExperience(Action):
-    def name(self):
-        return "action_extract_experience"
-
-    def run(self, dispatcher, tracker, domain):
-        experience_str = tracker.latest_message.get("text")
-        intent = tracker.latest_message.get("intent", {}).get("name")
-
-        if intent != "provide_experience":
-            return []
-
-        experience_years = parse_experience(experience_str)
-
-        if experience_years is None:
-            dispatcher.utter_message("Не смог определить ваш опыт. Попробуйте сказать, например: '5 лет', '7 месяцев' или 'без опыта'.")
-            return []
-        # if experience_years % 1.0 > 0:
-        #     dispatcher.utter_message(f"Я понял, что у вас {experience_years} лет опыта.")
-        # else:
-        #     dispatcher.utter_message(f"Я понял, что у вас {int(experience_years)} лет опыта.")
-        return [SlotSet("experience", experience_years)]
-
-
-
-
-def normalize_skill(skill):
-    """
-    Преобразует навык в синоним, если он есть в словаре.
-    """
-    skill = skill.lower()
-    return synonyms.get(skill, skill)  # Если есть синоним → заменяем
-
-def get_word_embedding(word):
-    """
-    Получает вектор слова из модели.
-    Если слова нет, возвращает нулевой вектор.
-    """
-    word = word.lower()  # Приводим к lowercase
-    try:
-        return model[word]
-    except KeyError:
-        print(f"[WARNING] Слово '{word}' отсутствует в модели!")
-        return np.zeros(300)  # Размер вектора 300
-
-
-def compute_similarity(candidate_skills, required_skills):
-    """
-    Считает косинусное сходство между навыками кандидата и требованиями вакансии.
-    """
-    candidate_vectors = []
-    required_vectors = []
-
-    for skill in candidate_skills:
-        normalized_skill = normalize_skill(skill)
-        vec = get_word_embedding(normalized_skill)
-        if np.any(vec):
-            candidate_vectors.append(vec)
-
-    for skill in required_skills:
-        normalized_skill = normalize_skill(skill)
-        vec = get_word_embedding(normalized_skill)
-        if np.any(vec):
-            required_vectors.append(vec)
-
-    if not candidate_vectors or not required_vectors:
-        return 0  # Если нет совпадающих слов, возвращаем 0
-
-    similarities = []
-    for c_vec in candidate_vectors:
-        for r_vec in required_vectors:
-            similarity = cosine_similarity([c_vec], [r_vec])[0][0]
-            similarities.append(similarity)
-
-    return np.mean(similarities) if similarities else 0
-
-
 def parse_salary(salary_str):
 
     print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
@@ -182,6 +101,96 @@ def parse_salary(salary_str):
         return int(value * 1000000)
 
     return int(value)
+
+
+
+def normalize_skill(skill):
+    """
+    Преобразует навык в синоним, если он есть в словаре.
+    """
+    skill = skill.lower()
+    return synonyms.get(skill, skill)  # Если есть синоним → заменяем
+
+def get_word_embedding(word, model):
+    """
+    Получает вектор слова из модели.
+    Если слова нет, возвращает нулевой вектор.
+    """
+
+    word = word.lower()
+
+    # Проверяем, есть ли слово в модели
+    if word in model:
+        return model[word]
+
+    # Разбиваем на части, усредняем подслова
+    subwords = word.split()
+    sub_vectors = [model[w] for w in subwords if w in model]
+
+    if sub_vectors:
+        return np.mean(sub_vectors, axis=0)  # Усредняем
+
+    print(f"[WARNING] Слово '{word}' отсутствует в модели!")
+    return np.zeros(300)  # Размер вектора 300
+
+
+def compute_mean_vector(skill_list, model):
+    """
+    Создает усредненный вектор всех навыков.
+    """
+    vectors = [get_word_embedding(normalize_skill(skill), model) for skill in skill_list]
+    vectors = [vec for vec in vectors if np.any(vec)]  # Фильтруем нулевые векторы
+
+    if not vectors:
+        return np.zeros(300)
+
+    return np.mean(vectors, axis=0)
+
+
+def compute_similarity(candidate_skills, required_skills, model):
+    """
+    Считает косинусное сходство между навыками кандидата и требованиями вакансии.
+    """
+    candidate_vector = compute_mean_vector(candidate_skills, model)
+    required_vector = compute_mean_vector(required_skills, model)
+
+    if np.all(candidate_vector == 0) or np.all(required_vector == 0):
+        return 0  # Если нет нормальных векторов, возвращаем 0
+
+    return cosine_similarity([candidate_vector], [required_vector])[0][0]
+
+
+
+class ActionResetSlots(Action):
+    def name(self):
+        return "action_reset_slots"
+
+    def run(self, dispatcher, tracker, domain):
+        return [AllSlotsReset()]
+
+
+
+class ActionExtractExperience(Action):
+    def name(self):
+        return "action_extract_experience"
+
+    def run(self, dispatcher, tracker, domain):
+        experience_str = tracker.latest_message.get("text")
+        intent = tracker.latest_message.get("intent", {}).get("name")
+
+        if intent != "provide_experience":
+            return []
+
+        experience_years = parse_experience(experience_str)
+
+        if experience_years is None:
+            dispatcher.utter_message("Не смог определить ваш опыт. Попробуйте сказать, например: '5 лет', '7 месяцев' или 'без опыта'.")
+            return []
+        # if experience_years % 1.0 > 0:
+        #     dispatcher.utter_message(f"Я понял, что у вас {experience_years} лет опыта.")
+        # else:
+        #     dispatcher.utter_message(f"Я понял, что у вас {int(experience_years)} лет опыта.")
+        return [SlotSet("experience", experience_years)]
 
 
 class ActionExtractSalary(Action):
@@ -262,25 +271,32 @@ class ActionEvaluateCandidate(Action):
 
         required = role_requirements[role]
 
-        # Оценка соответствия
+        # Оценка соответствия навыков
         exp_ok = experience >= required["min_experience"]
-        skill_similarity = compute_similarity(skills, required["required_skills"])
+        skill_similarity = compute_similarity(skills, required["required_skills"], model)
 
-        if exp_ok and skill_similarity > 0.5:  # Порог 50% сходства
-            response = f"✅ Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение. Сходство: {skill_similarity:.2f}"
+        # 📌 Оценка зарплатных ожиданий
+        predicted_salary = evaluate_salary(experience, skills)
+        salary_ok = salary <= predicted_salary * 1.2  # Если не превышает рыночную на 20%
+
+        if exp_ok and skill_similarity > 0.5 and salary_ok:
+            response = (f"✅ Ваш профиль подходит на {role}! "
+                        f"Ваша заявка отправлена на рассмотрение. "
+                        f"Вы соответствуете на {skill_similarity:.2f} %. "
+                        f"Ожидаемая зарплата: {predicted_salary:.0f}, ваша: {salary}")
 
             # ✅ Сохраняем кандидата в Excel
             self.save_candidate_to_excel(user_id, role, experience, skills, salary)
         else:
-            response = f"❌ К сожалению, вам пока не хватает опыта или навыков. Сходство: {skill_similarity:.2f}"
-
+            response = (f"❌ К сожалению, вам пока не хватает опыта, навыков или зарплатные ожидания слишком высоки. "
+                        f"Вы соответствуете на {skill_similarity:.2f} %. "
+                        f"Рынок предлагает {predicted_salary:.0f}, а вы запросили {salary}")
 
         dispatcher.utter_message(
             text=response,
-            buttons=[
-                {"title": "🔄 Начать заново", "payload": "/restart"}
-            ]
+            buttons=[{"title": "🔄 Начать заново", "payload": "/restart"}]
         )
+
         return []
 
     def get_telegram_user_info(self, user_id):
