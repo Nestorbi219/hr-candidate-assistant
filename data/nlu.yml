@@ -15,6 +15,9 @@ nlu:
       - dataanalyst
       - analyst
       - da
+      - аналитика
+      - аналитиком
+      - аналитике
   - synonym: "Data Scientist"
     examples: |
       - дата саентиста
@@ -32,12 +35,14 @@ nlu:
       - жатаинженера
       - дата инженера
       - дата инженер
+      - дата инженером
       - data engineer
       - инженер данных
       - de
   - synonym: "MLOps Engineer"
     examples: |
       - млопсинженер
+      - млопс инженером
       - млпосинженера
       - мл
       - млопс инженер
@@ -45,6 +50,9 @@ nlu:
       - инженер mlops
   - synonym: "Project Manager"
     examples: |
+      - руководителем
+      - менеджером
+      - менеджера
       - руководитель
       - проджект менеджер
       - проектный менеджер
@@ -64,10 +72,21 @@ nlu:
       - пи
       - пайтон
       - пай
+      - питоне
+      - питоном
+      - питона
   - synonym: "Pandas"
     examples: |
       - пандас
       - panda
+  - synonym: "Data Warehouse"
+    examples: |
+      - dw
+      - datawarehouse
+      - хранилище
+      - хранилище данных
+      - хд
+      - хранилищем данных
 
   - intent: greet
     examples: |
@@ -220,6 +239,9 @@ nlu:
       - Опыт работы с [PostgreSQL](skills) и [MySQL](skills)
       - Разрабатываю дашборды в [Tableau](skills) и Power [BI](skills)
       - Использую [Excel](skills) для финансового моделирования
+      - работал с [хранилищем данных](skills)
+      - работал с [питоном](skills)
+      - 
       - Опыт работы с [ETL](skills)-процессами и обработкой данных
 
 
