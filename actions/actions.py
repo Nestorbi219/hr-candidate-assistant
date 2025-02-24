@@ -17,30 +17,32 @@ import requests
 
 
 # Загружаем предобученные эмбеддинги
-word2vec_model = api.load("fasttext-wiki-news-subwords-300")
+model = api.load("fasttext-wiki-news-subwords-300")
 
 
 synonyms = {
-    "ml": "machine learning",
-    "sql": "database",
-    "python": "programming",
-    "tensorflow": "deep learning",
-    "pytorch": "deep learning",
+    # "sql": "database",
+    # "python": "programming",
+    "tensorflow": "deep",
+    "pytorch": "learning",
     "etl": "data pipeline",
     "ci/cd": "continuous integration",
-    "kubernetes": "container orchestration",
+    # "kubernetes": "container orchestration",
     "mlflow": "machine learning pipeline",
-    "prometheus": "monitoring system",
-    "torchserve": "deep learning serving"
+    # "prometheus": "monitoring system",
+    "torchserve": "deep learning serving",
+    "clickhouse": "databases",
+    "restapi": "api",
+    "data warehouse": "warehouse"
 }
 
 
 role_requirements = {
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "Pandas", "ETL"], "max_salary": 180000},
-            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "TensorFlow", "PyTorch", "NLP", "Pandas", "Numpy", "Scikit-learn", "Jupyter", "A/B"], "max_salary": 250000},
-            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Airflow", "MongoDB", "Apache"], "max_salary": 230000},
-            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "CI/CD", "Prometheus", "MLflow", "TorchServe"], "max_salary": 240000},
-            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "roadmap", "backlog"], "max_salary": 200000}
+            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "A/B", "Warehouse"], "max_salary": 180000},
+            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "deep", "learning", "Pandas", "Numpy", "Scikit-learn"], "max_salary": 250000},
+            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Databases", "Docker", "API"], "max_salary": 230000},
+            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "continuous integration", "prometheus", "machine learning pipeline", "Bash", "KubeFlow"], "max_salary": 240000},
+            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "Trello", "Confluence"], "max_salary": 300000}
 }
 
 
@@ -60,7 +62,7 @@ def parse_experience(experience_str):
     if re.search(r"полтора года", experience_str):
         return 1.5
 
-    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(год|лет|месяц|месяцев)?", experience_str)
+    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(год|лет|месяц|месяцев|года)?", experience_str)
 
     if not match:
         if re.search(r"есть опыт|опыт работы", experience_str):
@@ -77,7 +79,8 @@ def parse_experience(experience_str):
     if unit in ["месяц", "месяцев"]:
         return round(value / 12, 2)
 
-    return value
+    print("Опыт: ", value)
+    return float(value)
 
 
 class ActionExtractExperience(Action):
@@ -114,14 +117,14 @@ def normalize_skill(skill):
 
 def get_word_embedding(word):
     """
-    Получает вектор слова из Word2Vec.
+    Получает вектор слова из модели.
     Если слова нет, возвращает нулевой вектор.
     """
     word = word.lower()  # Приводим к lowercase
     try:
-        return word2vec_model[word]
+        return model[word]
     except KeyError:
-        print(f"[WARNING] Слово '{word}' отсутствует в модели Word2Vec!")
+        print(f"[WARNING] Слово '{word}' отсутствует в модели!")
         return np.zeros(300)  # Размер вектора 300
 
 
@@ -199,7 +202,7 @@ class ActionExtractSalary(Action):
                 "Не смог определить зарплату. Попробуйте сказать, например: '150к', '90 тысяч', '1.2 млн'.")
             return []
 
-        dispatcher.utter_message(f"Я понял, что вы ожидаете зарплату {salary_amount} рублей.")
+        # dispatcher.utter_message(f"Я понял, что вы ожидаете зарплату {salary_amount} рублей.")
         print("Зарплата: ", salary_amount)
         return [SlotSet("salary", salary_amount)]
 
@@ -263,7 +266,7 @@ class ActionEvaluateCandidate(Action):
         exp_ok = experience >= required["min_experience"]
         skill_similarity = compute_similarity(skills, required["required_skills"])
 
-        if exp_ok and skill_similarity > 0.5:  # Порог 60% сходства
+        if exp_ok and skill_similarity > 0.5:  # Порог 50% сходства
             response = f"✅ Ваш профиль подходит на {role}! Ваша заявка отправлена на рассмотрение. Сходство: {skill_similarity:.2f}"
 
             # ✅ Сохраняем кандидата в Excel

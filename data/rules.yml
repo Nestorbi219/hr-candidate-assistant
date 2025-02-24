@@ -14,6 +14,7 @@ rules:
       - action: action_reset_slots
       - action: utter_greet
       - action: utter_ask_action
+
   - rule: Активировать форму для сбора данных
     steps:
       - intent: provide_info
@@ -23,12 +24,12 @@ rules:
   - rule: Ответить про вакансии
     steps:
       - intent: ask_about_roles
-      - action: utter_available_roles  # Бот отвечает про вакансии и ЖДЕТ ответа пользователя
+      - action: utter_available_roles
 
   - rule: Ответить про компанию
     steps:
       - intent: ask_about_company
-      - action: utter_contact_hr  # Бот отвечает про компанию и ЖДЕТ ответа пользователя
+      - action: utter_contact_hr
 
   - rule: Оценка кандидата после заполнения формы
     condition:
@@ -36,21 +37,9 @@ rules:
     steps:
       - action: hr_form
       - active_loop: null
-      - action: action_evaluate_candidate
-
-  - rule: Обработать опыт работы
-    steps:
-      - intent: provide_experience
       - action: action_extract_experience
-      - slot_was_set:
-        - experience
-
-  - rule: Обработать зарплатные ожидания
-    steps:
-      - intent: provide_salary_expectation
       - action: action_extract_salary
-      - slot_was_set:
-        - salary
+      - action: utter_application_summary
       - action: action_evaluate_candidate
 
 
@@ -75,7 +64,18 @@ rules:
       - action: utter_goodbye
 
 
-#  - rule: Обработать опыт работы пользователя
+#  - rule: Обработать опыт работы
 #    steps:
 #      - intent: provide_experience
 #      - action: action_extract_experience
+#      - slot_was_set:
+#        - experience
+
+#  - rule: Обработать зарплатные ожидания
+#    steps:
+#      - intent: provide_salary_expectation
+#      - action: action_extract_salary
+#      - slot_was_set:
+#          - salary
+#      - action: utter_application_confirm  # Показываем пользователю зарплатное ожидание
+#      - action: action_evaluate_candidate
