@@ -159,7 +159,7 @@ responses:
         - Работает с потоковой обработкой данных
         - Оптимизирует работу с Big Data
         🔹 Требуемые навыки:      
-        SQL, Python, Spark, Airflow, PostgreSQL, ClickHouse, Hadoop, API и REST, Kafka, DevOps-инструменты (Docker, Kubernetes)
+        SQL, Python, Spark, Airflow, ClickHouse, Hadoop, API и REST, Kafka, DevOps-инструменты (Docker, Kubernetes)
         
         3. MLOps Engineer
         📌 Чем занимается:
@@ -199,25 +199,11 @@ responses:
           payload: '/provide_desired_role{"role":"MLOps Engineer"}'
         - title: "Project Manager"
           payload: '/provide_desired_role{"role":"Project Manager"}'
-      #      buttons:
-#        - title: "Оставить информацию о себе"
-#          payload: "/provide_info"
-#        - title: "Узнать о компании"
-#          payload: "/ask_about_company"
-#        - title: "Поговорить с HR"
-#          payload: "/request_human"
-#        - title: "Ничего, спасибо"
-#          payload: "/goodbye"
+
 
   utter_contact_hr:
     - text: "Вы можете связаться с HR-менеджером по email: hr@company.com. Что вы хотите сделать дальше?"
-#      buttons:
-#        - title: "Оставить информацию о себе"
-#          payload: "/provide_info"
-#        - title: "Узнать о вакансиях"
-#          payload: "/ask_about_roles"
-#        - title: "Ничего, спасибо"
-#          payload: "/goodbye"
+
 
   utter_ask_continue:
     - text: "Вы точно хотите остановить заполнение формы?"
@@ -231,6 +217,16 @@ responses:
   utter_update_confirmation:
     - text: "Я обновил вашу информацию. Нужно что-то еще изменить?"
 
+  utter_application_summary:
+    - text: |
+        Ваша заявка:
+        
+        Позиция: {role}
+        Опыт работы: {experience} лет
+        Навыки: {skills}
+        Ожидаемая заработная плата: {salary} рублей
+        
+
 
 actions:
   - action_save_candidate_data
@@ -238,6 +234,7 @@ actions:
   - action_extract_salary
   - action_extract_experience
   - action_reset_slots
+  - action_list_to_string
 
 
 session_config:
