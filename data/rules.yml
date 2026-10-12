@@ -1,88 +1,92 @@
-#file: noinspection YAMLSchemaValidation
-version: "3.1"
-
+version: '3.1'
 rules:
-#  - rule: Приветствие и выбор действия
-#    steps:
-#      - intent: greet
-#      - action: utter_greet
-#      - action: utter_ask_action
-
-  - rule: Очистка слотов и стартовый экран
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
-
-  - rule: Активировать форму для сбора данных
-    steps:
-      - intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
-
-  - rule: Начать сбор информации после выбора роли
-    steps:
-      - intent: provide_desired_role
-      - action: hr_form
-      - active_loop: hr_form
-
-
-  - rule: Ответить про вакансии
-    steps:
-      - intent: ask_about_roles
-      - action: utter_available_roles
-
-  - rule: Ответить про компанию
-    steps:
-      - intent: ask_about_company
-      - action: utter_contact_hr
-
-  - rule: Оценка кандидата после заполнения формы
-    condition:
-      - active_loop: hr_form
-    steps:
-      - action: hr_form
-      - active_loop: null
-      - action: action_extract_experience
-      - action: action_extract_salary
-      - action: utter_application_summary
-      - action: action_evaluate_candidate
-
-
-  - rule: Очистка слотов и стартовый экран
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
-
-  - rule: Перезапуск бота
-    steps:
-      - intent: restart
-#      - action: action_reset_slots
-      - action: action_restart
-      - action: utter_ask_action
-
-
-  - rule: Пользователь прощается
-    steps:
-      - intent: goodbye
-      - action: utter_goodbye
-
-
-#  - rule: Обработать опыт работы
-#    steps:
-#      - intent: provide_experience
-#      - action: action_extract_experience
-#      - slot_was_set:
-#        - experience
-
-#  - rule: Обработать зарплатные ожидания
-#    steps:
-#      - intent: provide_salary_expectation
-#      - action: action_extract_salary
-#      - slot_was_set:
-#          - salary
-#      - action: utter_application_confirm  # Показываем пользователю зарплатное ожидание
-#      - action: action_evaluate_candidate
+- rule: Приветствие
+  steps:
+  - intent: greet
+  - action: action_reset_slots
+  - action: utter_greet
+  - action: utter_ask_action
+- rule: 'Начать анкету: provide_info'
+  steps:
+  - intent: provide_info
+  - action: hr_form
+  - active_loop: hr_form
+- rule: 'Начать анкету: provide_info_again'
+  steps:
+  - intent: provide_info_again
+  - action: hr_form
+  - active_loop: hr_form
+- rule: 'Начать анкету: provide_desired_role'
+  steps:
+  - intent: provide_desired_role
+  - action: hr_form
+  - active_loop: hr_form
+- rule: Завершить анкету
+  condition:
+  - active_loop: hr_form
+  steps:
+  - action: hr_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_show_application_summary
+  - action: action_evaluate_candidate
+- rule: 'Ответ: ask_about_roles'
+  steps:
+  - intent: ask_about_roles
+  - action: utter_available_roles
+- rule: 'Ответ: ask_about_company'
+  steps:
+  - intent: ask_about_company
+  - action: utter_about_company
+- rule: 'Ответ: ask_about_process'
+  steps:
+  - intent: ask_about_process
+  - action: utter_process
+- rule: 'Ответ: request_human'
+  steps:
+  - intent: request_human
+  - action: utter_contact_hr
+- rule: 'Ответ: thank_you'
+  steps:
+  - intent: thank_you
+  - action: utter_thank_you
+- rule: 'Ответ: not_sure'
+  steps:
+  - intent: not_sure
+  - action: utter_not_sure
+- rule: 'Ответ: positive_answer'
+  steps:
+  - intent: positive_answer
+  - action: utter_not_sure
+- rule: 'Ответ: negative_answer'
+  steps:
+  - intent: negative_answer
+  - action: utter_not_sure
+- rule: 'Ответ: no_experience'
+  steps:
+  - intent: no_experience
+  - action: utter_not_sure
+- rule: 'Ответ: nlu_fallback'
+  steps:
+  - intent: nlu_fallback
+  - action: utter_default
+- rule: Перезапуск
+  steps:
+  - intent: restart
+  - action: action_restart
+  - action: utter_ask_action
+- rule: 'Завершить разговор: goodbye'
+  steps:
+  - intent: goodbye
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: action_reset_slots
+  - action: utter_goodbye
+- rule: 'Завершить разговор: not_interested'
+  steps:
+  - intent: not_interested
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: action_reset_slots
+  - action: utter_goodbye

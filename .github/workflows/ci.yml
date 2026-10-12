@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  actions:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: pip
+      - name: Install action and test dependencies
+        run: |
+          python -m pip install 'pip<24.1'
+          python -m pip install -r requirements-dev.txt
+      - run: ruff check actions tests scripts
+      - run: ruff format --check actions tests scripts
+      - run: pytest -q
+  rasa-validation:
+    runs-on: ubuntu-22.04
+    env:
+      RASA_TELEMETRY_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: pip
+      - name: Install Rasa
+        run: |
+          python -m pip install 'pip<24.1'
+          python -m pip install -r requirements.txt
+      - run: rasa data validate
+      - run: rasa train --fixed-model-name ci
+      - name: Test dialogue stories
+        run: rasa test core --stories tests/test_stories.yml --model models/ci.tar.gz --fail-on-prediction-errors
+      - name: Test full questionnaire over REST
+        run: |
+          rasa run actions > actions.log 2>&1 &
+          rasa run --enable-api --model models/ci.tar.gz --credentials credentials.yml > rasa.log 2>&1 &
+          python scripts/smoke_test.py
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rasa-diagnostics
+          path: |
+            actions.log
+            rasa.log
+            results/

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">HR Candidate Assistant</title>
+  <desc id="desc">Rasa and NLP portfolio project with candidate skill matching and Telegram integration.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#111d36"/><stop offset="1" stop-color="#233a59"/></linearGradient>
+  </defs>
+  <rect width="1200" height="300" rx="20" fill="url(#bg)"/>
+  <circle cx="1110" cy="-15" r="215" fill="#5ddac5" opacity=".06"/>
+  <circle cx="1020" cy="300" r="160" fill="#f6bd60" opacity=".08"/>
+  <text x="58" y="67" font-family="Arial,sans-serif" font-size="16" letter-spacing="4" fill="#5ddac5">TEAM PROJECT · NLP PORTFOLIO</text>
+  <text x="56" y="130" font-family="Arial,sans-serif" font-size="48" font-weight="700" fill="#fff">HR Candidate Assistant</text>
+  <text x="58" y="174" font-family="Arial,sans-serif" font-size="21" fill="#b9c9dd">Conversation. Skills. Structured applications.</text>
+  <rect x="58" y="216" width="87" height="32" rx="16" fill="#5ddac5"/>
+  <text x="101" y="238" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#122338">RASA</text>
+  <rect x="157" y="216" width="100" height="32" rx="16" fill="#314961"/>
+  <text x="207" y="238" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#fff">PYTHON</text>
+  <rect x="269" y="216" width="120" height="32" rx="16" fill="#314961"/>
+  <text x="329" y="238" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#fff">TELEGRAM</text>
+  <rect x="912" y="80" width="212" height="146" rx="18" fill="#15253e" stroke="#53728e"/>
+  <rect x="935" y="104" width="101" height="17" rx="8" fill="#5ddac5"/>
+  <rect x="965" y="137" width="136" height="17" rx="8" fill="#7493b5"/>
+  <rect x="935" y="170" width="111" height="17" rx="8" fill="#f6bd60"/>
+</svg>

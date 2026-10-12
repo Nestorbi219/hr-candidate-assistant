@@ -1,164 +1,17 @@
-from typing import Any, Text, Dict, List
-from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet
-from rasa_sdk.executor import CollectingDispatcher
-import json
-import re
-# from deeppavlov.models.embedders.fasttext_embedder import FasttextEmbedder
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-import gensim.downloader as api
-import re
-from rasa_sdk import Action
-from rasa_sdk.events import SlotSet, AllSlotsReset
-import pandas as pd
-import os
-import requests
+"""Rasa custom actions for the HR candidate questionnaire."""
+
+import logging
+
+from rasa_sdk import Action, FormValidationAction
+from rasa_sdk.events import AllSlotsReset
 
 from actions.evaluate_salary import evaluate_salary
+from actions.parsing import parse_experience, parse_salary
+from actions.skill_matching import match_skills
+from actions.storage import save_candidate
+from actions.vacancies import ROLE_REQUIREMENTS
 
-# Загружаем предобученные эмбеддинги
-model = api.load("fasttext-wiki-news-subwords-300")
-
-
-synonyms = {
-    # "sql": "database",
-    # "python": "programming",
-    "tensorflow": "deep",
-    "pytorch": "learning",
-    "etl": "data pipeline",
-    "ci/cd": "continuous integration",
-    # "kubernetes": "container orchestration",
-    "mlflow": "machine learning pipeline",
-    # "prometheus": "monitoring system",
-    "torchserve": "deep learning serving",
-    "clickhouse": "databases",
-    "restapi": "api",
-    "data warehouse": "warehouse",
-    "a/b": "ab testing",
-    "ab": "ab testing"
-}
-
-
-role_requirements = {
-            "Data Analyst": {"min_experience": 2, "required_skills": ["SQL", "BI", "Python", "Excel", "Tableau", "A/B"], "max_salary": 200000},
-            "Data Scientist": {"min_experience": 3, "required_skills": ["Python", "SQL", "deep", "learning", "Pandas", "Numpy", "Scikit-learn"], "max_salary": 270000},
-            "Data Engineer": {"min_experience": 3, "required_skills": ["Python", "SQL", "Spark", "Hadoop", "Kafka", "Databases", "Docker", "API"], "max_salary": 250000},
-            "MLOps Engineer": {"min_experience": 2, "required_skills": ["Docker", "Kubernetes", "continuous integration", "prometheus", "machine learning pipeline", "Bash", "KubeFlow"], "max_salary": 240000},
-            "Project Manager": {"min_experience": 5, "required_skills": ["Agile", "Scrum", "Jira", "Confluence", "Trello", "Confluence"], "max_salary": 200000}
-}
-
-
-def parse_experience(experience_str):
-    experience_str = experience_str.lower().strip()
-
-    if re.search(r"без опыта|новичок|только закончил", experience_str):
-        return 0.0
-
-    if re.search(r"полтора года", experience_str):
-        return 1.5
-
-    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(год|лет|месяц|месяцев|года)?", experience_str)
-
-    if not match:
-        if re.search(r"есть опыт|опыт работы", experience_str):
-            return 1.0
-        return None
-
-    value = float(match.group(1).replace(",", "."))
-    unit = match.group(2)
-
-    # ✅ Добавляем проверку: если значение слишком большое, это НЕ опыт работы
-    if value > 50:  # Люди не работают 200+ лет
-        return None
-
-    if unit in ["месяц", "месяцев"]:
-        return round(value / 12, 2)
-
-    print("Опыт: ", value)
-    return float(value)
-
-def parse_salary(salary_str):
-
-    print(f"[DEBUG] Обрабатываем ввод зарплаты: {salary_str}")  # ✅ Отладка
-
-    salary_str = salary_str.lower().strip()
-
-    match = re.search(r"(\d+(?:[.,]\d+)?)\s?(к|тыс|тысяч|млн|миллион)?", salary_str)
-
-    if not match:
-        value = re.search(r"\d{5,7}", salary_str)  # ✅ Поиск 5-7 значных чисел (обычные зарплаты)
-        if value:
-            return int(value.group(0))
-        return None
-
-    value = float(match.group(1).replace(",", "."))
-    unit = match.group(2)
-
-    if unit in ["к", "тыс", "тысяч"]:
-        return int(value * 1000)
-    elif unit in ["млн", "миллион"]:
-        return int(value * 1000000)
-
-    return int(value)
-
-
-
-def normalize_skill(skill):
-    """
-    Преобразует навык в синоним, если он есть в словаре.
-    """
-    skill = skill.lower()
-    return synonyms.get(skill, skill)  # Если есть синоним → заменяем
-
-def get_word_embedding(word, model):
-    """
-    Получает вектор слова из модели.
-    Если слова нет, возвращает нулевой вектор.
-    """
-
-    word = word.lower()
-
-    # Проверяем, есть ли слово в модели
-    if word in model:
-        return model[word]
-
-    # Разбиваем на части, усредняем подслова
-    subwords = word.split()
-    sub_vectors = [model[w] for w in subwords if w in model]
-
-    if sub_vectors:
-        return np.mean(sub_vectors, axis=0)  # Усредняем
-
-    print(f"[WARNING] Слово '{word}' отсутствует в модели!")
-    return np.zeros(300)  # Размер вектора 300
-
-
-def compute_mean_vector(skill_list, model):
-    """
-    Создает усредненный вектор всех навыков.
-    """
-    vectors = [get_word_embedding(normalize_skill(skill), model) for skill in skill_list]
-    vectors = [vec for vec in vectors if np.any(vec)]  # Фильтруем нулевые векторы
-
-    if not vectors:
-        return np.zeros(300)
-
-    return np.mean(vectors, axis=0)
-
-
-def compute_similarity(candidate_skills, required_skills, model):
-    """
-    Считает косинусное сходство между навыками кандидата и требованиями вакансии.
-    """
-    candidate_vector = compute_mean_vector(candidate_skills, model)
-    required_vector = compute_mean_vector(required_skills, model)
-
-    if np.all(candidate_vector == 0) or np.all(required_vector == 0):
-        return 0  # Если нет нормальных векторов, возвращаем 0
-
-    return cosine_similarity([candidate_vector], [required_vector])[0][0]
-
+logger = logging.getLogger(__name__)
 
 
 class ActionResetSlots(Action):
@@ -169,173 +22,113 @@ class ActionResetSlots(Action):
         return [AllSlotsReset()]
 
 
-
-class ActionExtractExperience(Action):
+class ValidateHRForm(FormValidationAction):
     def name(self):
-        return "action_extract_experience"
+        return "validate_hr_form"
 
-    def run(self, dispatcher, tracker, domain):
-        experience_str = tracker.latest_message.get("text")
-        intent = tracker.latest_message.get("intent", {}).get("name")
+    def validate_role(self, value, dispatcher, tracker, domain):
+        role = next(
+            (role for role in ROLE_REQUIREMENTS if role.casefold() == str(value).casefold()), None
+        )
+        if role is None:
+            dispatcher.utter_message(text="Выберите одну из пяти позиций с помощью кнопок.")
+        return {"role": role}
 
-        if intent != "provide_experience":
-            return []
+    def validate_experience(self, value, dispatcher, tracker, domain):
+        years = parse_experience(value)
+        if years is None:
+            dispatcher.utter_message(text="Укажите опыт, например: 5 лет, 6 месяцев или без опыта.")
+        return {"experience": years}
 
-        experience_years = parse_experience(experience_str)
-
-        if experience_years is None:
-            dispatcher.utter_message("Не смог определить ваш опыт. Попробуйте сказать, например: '5 лет', '7 месяцев' или 'без опыта'.")
-            return []
-        # if experience_years % 1.0 > 0:
-        #     dispatcher.utter_message(f"Я понял, что у вас {experience_years} лет опыта.")
-        # else:
-        #     dispatcher.utter_message(f"Я понял, что у вас {int(experience_years)} лет опыта.")
-        return [SlotSet("experience", experience_years)]
-
-
-class ActionExtractSalary(Action):
-    def name(self):
-        return "action_extract_salary"
-
-    def run(self, dispatcher, tracker, domain):
-        salary_str = tracker.latest_message.get("text")
-        intent = tracker.latest_message.get("intent", {}).get("name")
-
-        if intent != "provide_salary_expectation":
-            return []
-
-        salary_amount = parse_salary(salary_str)
-
-        if salary_amount is None:
+    def validate_salary(self, value, dispatcher, tracker, domain):
+        salary = parse_salary(value)
+        if salary is None:
             dispatcher.utter_message(
-                "Не смог определить зарплату. Попробуйте сказать, например: '150к', '90 тысяч', '1.2 млн'.")
+                text="Укажите одну сумму в рублях в месяц, например: 150к или 150 000."
+            )
+        return {"salary": salary}
+
+    def validate_skills(self, value, dispatcher, tracker, domain):
+        values = value if isinstance(value, list) else [value]
+        skills = list(
+            dict.fromkeys(str(item).strip() for item in values if item and str(item).strip())
+        )
+        if not skills:
+            dispatcher.utter_message(text="Перечислите навыки, например: Python, SQL, Pandas.")
+        return {"skills": skills or None}
+
+
+class ActionShowApplicationSummary(Action):
+    def name(self):
+        return "action_show_application_summary"
+
+    def run(self, dispatcher, tracker, domain):
+        skills = ", ".join(tracker.get_slot("skills") or [])
+        experience = parse_experience(tracker.get_slot("experience"))
+        salary = parse_salary(tracker.get_slot("salary"))
+        if experience is None or salary is None:
+            dispatcher.utter_message(text="Анкета ещё не заполнена.")
             return []
-
-        # dispatcher.utter_message(f"Я понял, что вы ожидаете зарплату {salary_amount} рублей.")
-        print("Зарплата: ", salary_amount)
-        return [SlotSet("salary", salary_amount)]
-
-
-class ActionSaveCandidateData(Action):
-    def name(self) -> Text:
-        return "action_save_candidate_data"
-
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        # Получаем данные из слотов
-        candidate_data = {
-            "role": tracker.get_slot("role"),
-            "experience": tracker.get_slot("experience"),
-            "skills": tracker.get_slot("skills"),
-            "salary": tracker.get_slot("salary")
-        }
-
-        # Сохраняем в JSON (можно изменить на запись в БД)
-        with open("candidates.json", "a") as file:
-            file.write(json.dumps(candidate_data, ensure_ascii=False) + "\n")
-
-        dispatcher.utter_message(text="Ваши данные сохранены. Спасибо!")
-
+        amount = f"{salary:,}".replace(",", " ")
+        years = f"{experience:g}".replace(".", ",")
+        dispatcher.utter_message(
+            text=(
+                f"Ваша анкета:\nПозиция: {tracker.get_slot('role')}\n"
+                f"Опыт: {years} лет\nНавыки: {skills}\n"
+                f"Зарплатные ожидания: {amount} ₽/мес."
+            )
+        )
         return []
 
 
 class ActionEvaluateCandidate(Action):
-    def name(self) -> str:
+    def name(self):
         return "action_evaluate_candidate"
 
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: dict) -> list:
-
-        user_id = tracker.sender_id
+    def run(self, dispatcher, tracker, domain):
         role = tracker.get_slot("role")
-        experience = tracker.get_slot("experience")
+        experience = parse_experience(tracker.get_slot("experience"))
+        salary = parse_salary(tracker.get_slot("salary"))
         skills = tracker.get_slot("skills")
-        salary = tracker.get_slot("salary")
-
-        if not role or not experience or not skills:
-            dispatcher.utter_message(text="Недостаточно данных для оценки. Заполните анкету заново.")
+        if role not in ROLE_REQUIREMENTS or experience is None or salary is None or not skills:
+            dispatcher.utter_message(
+                text="Недостаточно данных для оценки. Заполните анкету заново."
+            )
             return []
-
-        try:
-            experience = int(parse_experience(str(experience)))
-        except ValueError:
-            dispatcher.utter_message(text="Ошибка: Некорректный формат опыта работы.")
-            return []
-
-        if role not in role_requirements:
-            dispatcher.utter_message(text="Ошибка: указанной роли не существует.")
-            return []
-
-        required = role_requirements[role]
-
-        # Оценка соответствия навыков
-        exp_ok = experience >= required["min_experience"]
-        skill_similarity = compute_similarity(skills, required["required_skills"], model)
-
-        # 📌 Оценка зарплатных ожиданий
-        predicted_salary = evaluate_salary(experience, skills)
-        salary_ok = salary <= predicted_salary * 1.2  # Если не превышает рыночную на 20%
-
-        if exp_ok and skill_similarity > 0.5 and salary_ok:
-            response = (f"✅ Ваш профиль подходит на {role}! "
-                        f"Ваша заявка отправлена на рассмотрение. "
-                        f"Вы соответствуете на {skill_similarity:.2f} %. "
-                        f"Ожидаемая зарплата: {predicted_salary:.0f}, ваша: {salary}")
-
-            # ✅ Сохраняем кандидата в Excel
-            self.save_candidate_to_excel(user_id, role, experience, skills, salary)
-        else:
-            response = (f"❌ К сожалению, вам пока не хватает опыта, навыков или зарплатные ожидания слишком высоки. "
-                        f"Вы соответствуете на {skill_similarity:.2f} %. "
-                        f"Рынок предлагает {predicted_salary:.0f}, а вы запросили {salary}")
-
-        dispatcher.utter_message(
-            text=response,
-            buttons=[{"title": "🔄 Начать заново", "payload": "/restart"}]
+        required = ROLE_REQUIREMENTS[role]
+        similarity = match_skills(skills, required["required_skills"])
+        prediction = evaluate_salary(experience, skills)
+        suitable = (
+            experience >= required["min_experience"]
+            and similarity > 0.5
+            and salary <= prediction * 1.2
         )
-
+        if suitable:
+            candidate = {
+                "sender_id": tracker.sender_id,
+                "role": role,
+                "experience": experience,
+                "skills": skills,
+                "salary": salary,
+            }
+            try:
+                save_candidate(candidate)
+                result = "По условиям демо ваш профиль подходит. Заявка сохранена локально."
+            except OSError:
+                logger.exception("Could not save candidate record")
+                result = "По условиям демо ваш профиль подходит, но заявку сохранить не удалось."
+        else:
+            result = "По условиям демо профиль пока не соответствует всем требованиям."
+        salary_text = f"{salary:,}".replace(",", " ")
+        prediction_text = f"{prediction:,.0f}".replace(",", " ")
+        dispatcher.utter_message(
+            text=(
+                f"{result}\n"
+                f"Сопоставление навыков: {similarity:.0%}.\n"
+                f"Опыт: {experience:g} лет; требуется от {required['min_experience']}.\n"
+                f"Прогноз учебной модели: {prediction_text} ₽/мес.; ожидания: {salary_text} ₽/мес.\n"
+                "Результат демонстрационный; решение о найме принимает рекрутер."
+            ),
+            buttons=[{"title": "Начать заново", "payload": "/restart"}],
+        )
         return []
-
-    def get_telegram_user_info(self, user_id):
-        """Получает username пользователя Telegram через API"""
-        TELEGRAM_BOT_TOKEN = "REDACTED_TELEGRAM_TOKEN"  # Замени на свой токен бота
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getChat?chat_id={user_id}"
-
-        try:
-            response = requests.get(url)
-            data = response.json()
-            if data.get("ok"):
-                username = data["result"].get("username")
-                return f"@{username}" if username else "Неизвестный"
-        except Exception as e:
-            print(f"Ошибка получения Telegram username: {e}")
-
-        return "Ошибка"
-
-    def save_candidate_to_excel(self, user_id, role, experience, skills, salary):
-        """Сохраняет данные подходящих кандидатов в Excel"""
-
-        file_path = os.path.join("C:\\Users\\Egor Vegel\\Desktop\\RasaProject", "candidates.xlsx")
-        user_name = self.get_telegram_user_info(user_id)
-
-        # Создаём DataFrame
-        new_data = pd.DataFrame([{
-            "telegram": user_name,
-            "Опыт (лет)": experience,
-            "Навыки": ", ".join(skills) if skills else "",
-            "Ожидания по зарплате": salary,
-            "Желаемая роль": role
-        }])
-
-        # Загружаем существующий файл, если он есть
-        try:
-            existing_data = pd.read_excel(file_path, engine="openpyxl")
-            updated_data = pd.concat([existing_data, new_data], ignore_index=True)
-        except FileNotFoundError:
-            updated_data = new_data
-
-        # Сохраняем обновленные данные
-        updated_data.to_excel(file_path, index=False, engine="openpyxl")

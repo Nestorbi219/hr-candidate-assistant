@@ -1,0 +1,2 @@
+rasa==3.6.21
+-r requirements-actions.txt

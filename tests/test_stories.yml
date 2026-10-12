@@ -1,49 +1,27 @@
 version: "3.1"
-
 stories:
-
-  - story: Тест — кандидат выбирает роль Data Scientist
+  - story: Приветствие и вакансии
     steps:
       - user: |
           Привет
         intent: greet
+      - action: action_reset_slots
       - action: utter_greet
-
-      - user: "/provide_info"
-        intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
-
-      - action: utter_ask_role
-
+      - action: utter_ask_action
       - user: |
-          Я хочу работать Data Scientist
-        intent: provide_desired_role
-        entities:
-          - role: "Data Scientist"
-      - action: action_extract_role
-
+          Какие вакансии у вас есть?
+        intent: ask_about_roles
+      - action: utter_available_roles
+  - story: Связь с рекрутером
+    steps:
       - user: |
-          У меня 3 года опыта
-        intent: provide_experience
-        entities:
-          - experience: "3 года"
-      - action: action_extract_experience
-
+          Можно ли поговорить с HR?
+        intent: request_human
+      - action: utter_contact_hr
+  - story: Перезапуск
+    steps:
       - user: |
-          Я знаю Python и SQL
-        intent: provide_skills
-        entities:
-          - skills: ["Python", "SQL"]
-      - action: action_extract_skills
-
-      - user: |
-          Ожидаю зарплату 150к рублей
-        intent: provide_salary_expectation
-        entities:
-          - salary: "150000"
-      - action: action_extract_salary
-
-      - action: hr_form
-      - active_loop: null
-      - action: action_evaluate_candidate
+          /restart
+        intent: restart
+      - action: action_restart
+      - action: utter_ask_action

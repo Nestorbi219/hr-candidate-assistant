@@ -1,244 +1,152 @@
-version: "3.1"
-
+version: '3.1'
 intents:
-  - greet
-  - goodbye
-  - thank_you
-  - choose_action
-  - provide_info
-  - provide_experience 
-  - provide_skills
-  - provide_salary_expectation 
-  - provide_desired_role
-  - ask_about_roles
-  - ask_about_process
-  - ask_about_company
-  - request_human
-  - not_sure 
-  - not_interested
-  - no_experience
-  - provide_info_again
-  - positive_answer
-  - negative_answer
-
+- greet
+- goodbye
+- thank_you
+- provide_info
+- provide_experience
+- provide_skills
+- provide_salary_expectation
+- provide_desired_role
+- ask_about_roles
+- ask_about_process
+- ask_about_company
+- request_human
+- not_sure
+- not_interested
+- no_experience
+- provide_info_again
+- positive_answer
+- negative_answer
+- restart
+- nlu_fallback
 entities:
-  - experience
-  - skills
-  - salary
-  - role
-
+- experience
+- skills
+- salary
+- role
 slots:
   experience:
     type: float
-    influence_conversation: true
+    influence_conversation: false
     mappings:
-      - type: from_entity
-        entity: experience
-        intent: provide_experience
-        not_intent: provide_salary_expectation
-        conditions:
-        - active_loop: hr_form
-          requested_slot: experience
-
+    - type: from_text
+      intent:
+      - provide_experience
+      - no_experience
+      conditions:
+      - active_loop: hr_form
+        requested_slot: experience
   salary:
     type: float
-    influence_conversation: true
+    influence_conversation: false
     mappings:
-      - type: from_entity
-        entity: salary
-        intent: provide_salary_expectation
-        not_intent: provide_experience
-        conditions:
-        - active_loop: hr_form
-          requested_slot: salary
-
-
+    - type: from_text
+      intent: provide_salary_expectation
+      conditions:
+      - active_loop: hr_form
+        requested_slot: salary
   skills:
     type: list
-    influence_conversation: true
+    influence_conversation: false
     mappings:
-      - type: from_entity
-        entity: skills
-        intent: provide_skills
-
+    - type: from_entity
+      entity: skills
+      intent: provide_skills
+      conditions:
+      - active_loop: hr_form
+        requested_slot: skills
   role:
     type: text
-    influence_conversation: true
+    influence_conversation: false
     mappings:
-      - type: from_entity
-        entity: role
-
-
+    - type: from_entity
+      entity: role
 forms:
   hr_form:
     required_slots:
-      - role
-      - experience
-      - skills
-      - salary
-
+    - role
+    - experience
+    - skills
+    - salary
 responses:
-  utter_salary_confirm:
-    - text: "Спасибо, учёл вашу зарплатную ожидание: {salary} рублей."
-
-
   utter_ask_action:
-    - text: "Что вы хотите сделать?"
-      button_type: vertical
-      buttons:
-        - title: "Оставить информацию о себе"
-          payload: "/provide_info"
-        - title: "Узнать о вакансиях"
-          payload: "/ask_about_roles"
-        - title: "Поговорить с HR"
-          payload: "/request_human"
-
+  - text: Что вы хотите сделать?
+    button_type: vertical
+    buttons:
+    - title: Оставить информацию о себе
+      payload: /provide_info
+    - title: Узнать о вакансиях
+      payload: /ask_about_roles
+    - title: Поговорить с HR
+      payload: /request_human
   utter_greet:
-    - text: |
-        Здравствуйте! Я HR-бот.
-      
-        Мы - TechNova Solutions, динамично развивающаяся IT-компания, специализирующаяся на разработке высокотехнологичных решений в сфере искусственного интеллекта, обработки данных и облачных вычислений. Мы создаем интеллектуальные системы для автоматизации бизнеса, аналитики данных и кибербезопасности.
-        
-        Основные направления работы:
-        
-        🔹Разработка AI-решений и машинного обучения
-        🔹Big Data и аналитика данных
-        🔹Разработка веб- и мобильных приложений
-        🔹Кибербезопасность и защита данных
-        🔹Облачные технологии и DevOps
-        
-        Мы ищем талантливых IT-специалистов, готовых работать с передовыми технологиями, решать сложные задачи и развиваться в инновационной среде!
-
+  - text: Здравствуйте! Я HR-бот учебного проекта TechNova Solutions. Помогу посмотреть демо-вакансии и заполнить анкету кандидата.
   utter_ask_experience:
-    - text: "Сколько лет опыта у вас в сфере IT?"
-
+  - text: Сколько лет опыта у вас в сфере IT?
   utter_ask_skills:
-    - text: "Какие ключевые навыки у вас есть?"
-
+  - text: Какие ключевые навыки у вас есть?
   utter_ask_salary:
-    - text: "На какую зарплату рассчитываете?"
-
+  - text: На какую зарплату рассчитываете?
   utter_ask_role:
-    - text: "На какую позицию вы хотите податься?"
-      button_type: vertical
-      buttons:
-        - title: "Data Analyst"
-          payload: '/provide_desired_role{"role":"Data Analyst"}'
-        - title: "Data Scientist"
-          payload: '/provide_desired_role{"role":"Data Scientist"}'
-        - title: "Data Engineer"
-          payload: '/provide_desired_role{"role":"Data Engineer"}'
-        - title: "MLOps Engineer"
-          payload: '/provide_desired_role{"role":"MLOps Engineer"}'
-        - title: "Project Manager"
-          payload: '/provide_desired_role{"role":"Project Manager"}'
-
+  - text: На какую позицию вы хотите податься?
+    button_type: vertical
+    buttons:
+    - title: Data Analyst
+      payload: /provide_desired_role{"role":"Data Analyst"}
+    - title: Data Scientist
+      payload: /provide_desired_role{"role":"Data Scientist"}
+    - title: Data Engineer
+      payload: /provide_desired_role{"role":"Data Engineer"}
+    - title: MLOps Engineer
+      payload: /provide_desired_role{"role":"MLOps Engineer"}
+    - title: Project Manager
+      payload: /provide_desired_role{"role":"Project Manager"}
   utter_thank_you:
-    - text: "Спасибо за информацию! Мы свяжемся с вами позже."
-      buttons:
-        - title: "🔄 Начать заново"
-          payload: "/restart"
-
+  - text: Пожалуйста! Могу показать вакансии или помочь заполнить анкету.
   utter_goodbye:
-    - text: "Всего доброго! Если будут вопросы, пишите."
-
+  - text: Всего доброго! Если будут вопросы, пишите.
   utter_available_roles:
-    - text: |
-        1. Data Scientist 
-        📌 Чем занимается:
-        - Разрабатывает и обучает модели машинного обучения (ML)
-        - Анализирует большие объемы данных, выявляет закономерности
-        - Разрабатывает предсказательные модели и системы рекомендаций
-        - Работает с нейросетями, NLP, компьютерным зрением  
-        🔹 Требуемые навыки: 
-        Python, SQL, TensorFlow/PyTorch, Pandas, NumPy, Matplotlib,  
-        Статистика и математическое моделирование, Навыки работы с Big Data
-        
-        2. Data Engineer
-        📌 Чем занимается:
-        - Разрабатывает ETL-пайплайны для обработки данных
-        - Проектирует базы данных и хранилища (DWH)
-        - Работает с потоковой обработкой данных
-        - Оптимизирует работу с Big Data
-        🔹 Требуемые навыки:      
-        SQL, Python, Spark, Airflow, ClickHouse, Hadoop, API и REST, Kafka, DevOps-инструменты (Docker, Kubernetes)
-        
-        3. MLOps Engineer
-        📌 Чем занимается:
-        - Автоматизирует процесс развертывания и поддержки ML-моделей
-        - Оптимизирует и мониторит ML-системы в продакшене
-        - Работает с CI/CD для моделей машинного обучения
-        - Настраивает логирование и алертинг
-        🔹 Требуемые навыки:      
-        Docker, Kubernetes, CI/CD (GitLab, Jenkins), MLFlow, Kubeflow, Python, Bash, Работа с облаками (AWS, GCP, Azure)      
-        
-        4. Project Manager
-        📌 Чем занимается:
-        - Ведет IT-проекты, контролирует их выполнение
-        - Управляет командой разработчиков и аналитиков
-        - Определяет сроки и ресурсы проекта
-        - Взаимодействует с бизнес-заказчиками
-        🔹 Требуемые навыки:      
-        Agile/Scrum/Kanban, Управление рисками, дедлайнами, Навыки общения и работы с командой, Jira, Trello, Confluence       
-        
-        5. Data Analyst
-        📌 Чем занимается:
-        - Анализирует данные и создает отчеты
-        - Работает с BI-инструментами и SQL
-        - Помогает бизнесу принимать решения на основе данных
-        - Создает дашборды и визуализации
-        🔹 Требуемые навыки:      
-        SQL, Python, Excel, BI-инструменты (Power BI, Tableau), Статистика и A/B-тесты, Работа с хранилищами данных
-      button_type: vertical
-      buttons:
-        - title: "Data Analyst"
-          payload: '/provide_desired_role{"role":"Data Analyst"}'
-        - title: "Data Scientist"
-          payload: '/provide_desired_role{"role":"Data Scientist"}'
-        - title: "Data Engineer"
-          payload: '/provide_desired_role{"role":"Data Engineer"}'
-        - title: "MLOps Engineer"
-          payload: '/provide_desired_role{"role":"MLOps Engineer"}'
-        - title: "Project Manager"
-          payload: '/provide_desired_role{"role":"Project Manager"}'
+  - text: 'Демо-вакансии:
 
+      • Data Analyst — SQL, Python, BI и аналитика данных.
 
+      • Data Scientist — Python, машинное обучение и статистика.
+
+      • Data Engineer — SQL, Spark и инфраструктура данных.
+
+      • MLOps Engineer — Docker, Kubernetes и ML-пайплайны.
+
+      • Project Manager — Agile, Scrum и управление проектами.
+
+      Выберите интересующую позицию.'
+    button_type: vertical
+    buttons:
+    - title: Data Analyst
+      payload: /provide_desired_role{"role":"Data Analyst"}
+    - title: Data Scientist
+      payload: /provide_desired_role{"role":"Data Scientist"}
+    - title: Data Engineer
+      payload: /provide_desired_role{"role":"Data Engineer"}
+    - title: MLOps Engineer
+      payload: /provide_desired_role{"role":"MLOps Engineer"}
+    - title: Project Manager
+      payload: /provide_desired_role{"role":"Project Manager"}
   utter_contact_hr:
-    - text: "Вы можете связаться с HR-менеджером по email: hr@company.com. Что вы хотите сделать дальше?"
-
-
-  utter_ask_continue:
-    - text: "Вы точно хотите остановить заполнение формы?"
-
+  - text: В этом учебном демо нет настоящего HR-менеджера. В рабочем боте здесь можно указать контакт рекрутера.
   utter_not_sure:
-    - text: "Хорошо, если что-то неясно, дайте знать!"
-
-  utter_ask_what_to_update:
-    - text: "Что именно вы хотите исправить? (роль, опыт, навыки, зарплату?)"
-
-  utter_update_confirmation:
-    - text: "Я обновил вашу информацию. Нужно что-то еще изменить?"
-
-  utter_application_summary:
-    - text: |
-        Ваша заявка:
-        
-        Позиция: {role}
-        Опыт работы: {experience} лет
-        Навыки: {skills}
-        Ожидаемая заработная плата: {salary} рублей
-        
-
-
+  - text: Можно посмотреть вакансии или начать заново командой /restart. Если заполняете анкету, ответьте на текущий вопрос.
+  utter_about_company:
+  - text: TechNova Solutions — вымышленная IT-компания для демонстрации HR-бота. Вакансии и требования иллюстративные.
+  utter_process:
+  - text: Сначала вы выбираете роль, затем указываете опыт, навыки и зарплату. Бот покажет демонстрационное сопоставление с вакансией.
+  utter_default:
+  - text: Не удалось понять сообщение. Попробуйте переформулировать ответ или начните заново командой /restart.
 actions:
-  - action_save_candidate_data
-  - action_evaluate_candidate
-  - action_extract_salary
-  - action_extract_experience
-  - action_reset_slots
-  - action_list_to_string
-
-
+- action_reset_slots
+- validate_hr_form
+- action_evaluate_candidate
+- action_show_application_summary
 session_config:
   session_expiration_time: 60
-  carry_over_slots_to_new_session: true
+  carry_over_slots_to_new_session: false

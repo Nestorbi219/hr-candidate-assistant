@@ -1,68 +1,69 @@
-version: "3.1"
-
+version: '3.1'
 stories:
-  - story: Пользователь просматривает доступные вакансии и подает заявку
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
-      - intent: ask_about_roles
-      - action: utter_available_roles
-      - intent: provide_desired_role
-      - action: hr_form
-      - active_loop: hr_form
-      - active_loop: null
-      - action: action_extract_experience
-      - action: action_extract_salary
-      - action: utter_application_summary
-      - action: action_evaluate_candidate
-      - intent: goodbye
-      - action: utter_goodbye
-
-  - story: Пользователь сразу оставляет заявку
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
-      - intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
-      - active_loop: null
-      - action: action_extract_experience
-      - action: action_extract_salary
-      - action: utter_application_summary
-      - action: action_evaluate_candidate
-      - intent: goodbye
-      - action: utter_goodbye
-
-  - story: Пользователь хочет заново запустить после заполнения формы
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
-      - intent: provide_info
-      - action: hr_form
-      - active_loop: hr_form
-      - active_loop: null
-      - action: action_extract_experience
-      - action: action_extract_salary
-      - action: utter_application_summary
-      - action: action_evaluate_candidate
-      - intent: restart
-      - action: action_restart
-      - action: utter_ask_action
-
-  - story: Пользователь разговаривает с HR и уходит
-    steps:
-      - intent: greet
-      - action: action_reset_slots
-      - action: utter_greet
-      - action: utter_ask_action
-      - intent: request_human
-      - action: utter_contact_hr
-      - action: utter_ask_action
-      - intent: goodbye
-      - action: utter_goodbye
+- story: Просмотр вакансий
+  steps:
+  - intent: greet
+  - action: action_reset_slots
+  - action: utter_greet
+  - action: utter_ask_action
+  - intent: ask_about_roles
+  - action: utter_available_roles
+  - intent: goodbye
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: action_reset_slots
+  - action: utter_goodbye
+- story: Вопрос рекрутеру
+  steps:
+  - intent: greet
+  - action: action_reset_slots
+  - action: utter_greet
+  - action: utter_ask_action
+  - intent: request_human
+  - action: utter_contact_hr
+  - intent: goodbye
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: action_reset_slots
+  - action: utter_goodbye
+- story: Полная анкета кандидата
+  steps:
+  - intent: provide_info
+  - action: hr_form
+  - active_loop: hr_form
+  - slot_was_set:
+    - requested_slot: role
+  - intent: provide_desired_role
+    entities:
+    - role
+  - slot_was_set:
+    - role: Data Scientist
+  - action: hr_form
+  - slot_was_set:
+    - requested_slot: experience
+  - intent: provide_experience
+  - slot_was_set:
+    - experience: 3.5
+  - action: hr_form
+  - slot_was_set:
+    - requested_slot: skills
+  - intent: provide_skills
+    entities:
+    - skills: Python
+    - skills: SQL
+  - slot_was_set:
+    - skills:
+      - Python
+      - SQL
+  - action: hr_form
+  - slot_was_set:
+    - requested_slot: salary
+  - intent: provide_salary_expectation
+  - slot_was_set:
+    - salary: 150000.0
+  - action: hr_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_show_application_summary
+  - action: action_evaluate_candidate
